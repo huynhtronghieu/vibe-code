@@ -1905,24 +1905,39 @@ function updatePrediction(allFeedings) {
 
   var lastFeeding = sorted[0];
 
-  // Adjust interval based on last feeding amount vs standard
-  // If baby ate less than standard, they'll be hungry sooner
-  var lastMl = 0;
-  if (lastFeeding.type === 'formula' || lastFeeding.type === 'breast_milk') {
-    lastMl = lastFeeding.amount || 0;
-  } else if (lastFeeding.type === 'nursing') {
-    lastMl = lastFeeding.estimatedMl || estimateNursingMl(lastFeeding.duration || 0);
+  // Group recent feedings into a "session" — consecutive feeds within minIntervalMs
+  // are treated as one feeding session (e.g. 30ml at 20:57 + 15ml at 21:15 = 45ml session)
+  var sessionMl = 0;
+  var sessionStart = new Date(lastFeeding.timestamp);
+  for (var si = 0; si < sorted.length; si++) {
+    var f = sorted[si];
+    var fTime = new Date(f.timestamp);
+    // If this feeding is within minIntervalMs of the next one (closer to now), group it
+    if (si === 0 || (new Date(sorted[si - 1].timestamp) - fTime) < minIntervalMs) {
+      if (f.type === 'formula' || f.type === 'breast_milk') {
+        sessionMl += (f.amount || 0);
+      } else if (f.type === 'nursing') {
+        sessionMl += (f.estimatedMl || estimateNursingMl(f.duration || 0));
+      }
+      sessionStart = fTime; // earliest feeding in session
+    } else {
+      break;
+    }
   }
+
+  // Adjust interval based on session total vs standard
+  // If baby ate less than standard in this session, they'll be hungry sooner
   var stdAvgMl = (std.mlMin + std.mlMax) / 2;
   var adjustedIntervalMs = avgIntervalMs;
-  if (lastMl > 0 && stdAvgMl > 0) {
-    var ratio = lastMl / stdAvgMl;
+  if (sessionMl > 0 && stdAvgMl > 0) {
+    var ratio = sessionMl / stdAvgMl;
     // Clamp ratio: at least 30% interval (very small feed), at most 120% (large feed)
     ratio = Math.max(0.3, Math.min(1.2, ratio));
     adjustedIntervalMs = Math.round(avgIntervalMs * ratio);
   }
 
-  var nextTime = new Date(new Date(lastFeeding.timestamp).getTime() + adjustedIntervalMs);
+  // Calculate next time from the SESSION START (first feed in group), not last feed
+  var nextTime = new Date(sessionStart.getTime() + adjustedIntervalMs);
 
   // === Calculate today's total ml (bottle + estimated nursing) ===
   var today = startOfDay(new Date());

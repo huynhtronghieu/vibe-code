@@ -78,12 +78,16 @@ body {
 
 .form-group input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 14px 16px;
   border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 16px;
   outline: none;
   transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .form-group input:focus {
@@ -609,11 +613,15 @@ body {
 
 .time-section input[type="datetime-local"] {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 12px 16px;
   border: 2px solid var(--border);
   border-radius: 12px;
   font-size: 15px;
   outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .time-section input[type="datetime-local"]:focus {
@@ -814,6 +822,8 @@ body {
 
 .settings-item input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 12px;
   border: 2px solid var(--border);
   border-radius: 10px;

@@ -1,210 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
+  <title>Vibe Apps — by HieuHT</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0a0a0f;
-      overflow: hidden;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #05060f;
+      font-family: 'Rajdhani', sans-serif;
+      color: #e0e0e0;
+      overflow-x: hidden;
     }
 
-    /* Animated background grid */
-    .grid {
+    /* === ANIMATED BACKGROUND === */
+    .bg-grid {
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(100, 60, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(100, 60, 255, 0.07) 1px, transparent 1px);
-      background-size: 60px 60px;
-      animation: gridMove 20s linear infinite;
+        linear-gradient(rgba(0, 255, 200, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 200, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridScroll 25s linear infinite;
+      z-index: 0;
     }
 
-    @keyframes gridMove {
+    @keyframes gridScroll {
       0%   { transform: translateY(0); }
-      100% { transform: translateY(60px); }
+      100% { transform: translateY(50px); }
     }
 
-    /* Floating orbs */
-    .orb {
+    .bg-glow {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.35;
-      animation: float 8s ease-in-out infinite alternate;
+      filter: blur(120px);
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 0;
     }
+    .bg-glow-1 { width: 600px; height: 600px; background: #00ffc8; top: -200px; left: -150px; animation: drift 12s ease-in-out infinite alternate; }
+    .bg-glow-2 { width: 500px; height: 500px; background: #7c3aed; bottom: -150px; right: -100px; animation: drift 15s ease-in-out infinite alternate-reverse; }
+    .bg-glow-3 { width: 350px; height: 350px; background: #00a8ff; top: 40%; left: 60%; animation: drift 10s ease-in-out infinite alternate; }
 
-    .orb-1 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, #7c3aed, transparent 70%);
-      top: -100px; left: -100px;
-      animation-delay: 0s;
-    }
-
-    .orb-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, #2563eb, transparent 70%);
-      bottom: -80px; right: -80px;
-      animation-delay: -3s;
-    }
-
-    .orb-3 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, #db2777, transparent 70%);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation-delay: -6s;
-    }
-
-    @keyframes float {
+    @keyframes drift {
       0%   { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(30px, 40px) scale(1.1); }
+      100% { transform: translate(40px, -30px) scale(1.15); }
     }
 
-    /* Main container */
-    .container {
-      position: relative;
-      text-align: center;
-      z-index: 10;
-    }
-
-    /* Glowing card */
-    .card {
-      position: relative;
-      padding: 60px 80px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.05),
-        0 40px 80px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-
-    /* Animated border gradient */
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border-radius: 25px;
-      background: linear-gradient(135deg, #7c3aed, #2563eb, #db2777, #7c3aed);
-      background-size: 300% 300%;
-      animation: borderRotate 4s linear infinite;
-      z-index: -1;
-      opacity: 0.6;
-    }
-
-    .card::after {
-      content: '';
-      position: absolute;
+    /* Scanline */
+    .scanline {
+      position: fixed;
       inset: 0;
-      border-radius: 24px;
-      background: rgba(10, 10, 15, 0.95);
-      z-index: -1;
-    }
-
-    @keyframes borderRotate {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Greeting label */
-    .label {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: rgba(200, 160, 255, 0.7);
-      margin-bottom: 20px;
-      padding: 6px 16px;
-      border: 1px solid rgba(124, 58, 237, 0.3);
-      border-radius: 100px;
-      background: rgba(124, 58, 237, 0.1);
-    }
-
-    /* Main text */
-    .hello {
-      font-size: clamp(56px, 10vw, 100px);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -3px;
-      background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #818cf8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
-    }
-
-    .world {
-      font-size: clamp(56px, 10vw, 100px);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -3px;
-      background: linear-gradient(135deg, #f472b6 0%, #a78bfa 50%, #60a5fa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0%, 100% { filter: brightness(1); }
-      50%       { filter: brightness(1.3); }
-    }
-
-    /* Subtitle */
-    .subtitle {
-      margin-top: 24px;
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.35);
-      letter-spacing: 1px;
-    }
-
-    /* Divider */
-    .divider {
-      margin: 32px auto;
-      width: 60px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.6), transparent);
-    }
-
-    /* Particle dots */
-    .dots {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 28px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #7c3aed;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    .dot:nth-child(2) { animation-delay: 0.2s; background: #2563eb; }
-    .dot:nth-child(3) { animation-delay: 0.4s; background: #db2777; }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50%       { transform: scale(1.6); opacity: 1; }
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 200, 0.008) 2px,
+        rgba(0, 255, 200, 0.008) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
     }
 
     /* Floating particles */
@@ -212,157 +71,415 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 5;
+      z-index: 1;
     }
-
     .particle {
       position: absolute;
       width: 2px;
       height: 2px;
       border-radius: 50%;
-      background: rgba(167, 139, 250, 0.6);
-      animation: rise linear infinite;
+      animation: riseUp linear infinite;
     }
-
-    @keyframes rise {
+    @keyframes riseUp {
       0%   { transform: translateY(100vh) scale(0); opacity: 0; }
       10%  { opacity: 1; }
-      90%  { opacity: 1; }
+      90%  { opacity: 0.8; }
       100% { transform: translateY(-10vh) scale(1); opacity: 0; }
     }
 
-    /* Click ripple */
-    .ripple {
-      position: fixed;
+    /* === HEADER === */
+    .header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 80px 20px 20px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #00ffc8;
+      padding: 8px 20px;
+      border: 1px solid rgba(0, 255, 200, 0.2);
+      border-radius: 100px;
+      background: rgba(0, 255, 200, 0.05);
+      margin-bottom: 24px;
+    }
+
+    .logo-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      border: 2px solid rgba(167, 139, 250, 0.6);
-      transform: scale(0);
-      pointer-events: none;
-      z-index: 20;
+      background: #00ffc8;
+      box-shadow: 0 0 10px #00ffc8;
+      animation: blink 2s ease-in-out infinite;
     }
 
-    .ripple.active {
-      animation: rippleOut 0.8s ease-out forwards;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
-    @keyframes rippleOut {
-      to { transform: scale(6); opacity: 0; }
+    .main-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(40px, 8vw, 80px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 0%, #00ffc8 40%, #7c3aed 70%, #00a8ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 2px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .subtitle span {
+      color: #00ffc8;
+      font-weight: 500;
+    }
+
+    /* Decorative line */
+    .hline {
+      width: 120px;
+      height: 1px;
+      margin: 40px auto;
+      background: linear-gradient(90deg, transparent, #00ffc8, transparent);
+      position: relative;
+      z-index: 10;
+    }
+
+    /* === APP GRID === */
+    .app-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* === APP CARD === */
+    .app-card {
+      position: relative;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(12px);
+      padding: 36px 28px 28px;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+      cursor: pointer;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .app-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 21px;
+      background: linear-gradient(135deg, var(--card-accent), transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: -1;
+    }
+
+    .app-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 40px var(--card-glow);
+    }
+
+    .app-card:hover::before {
+      opacity: 0.15;
+    }
+
+    .app-card:hover .card-icon {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px var(--card-glow);
+    }
+
+    .card-status {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    .status-live {
+      color: #00ffc8;
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      background: rgba(0, 255, 200, 0.1);
+    }
+
+    .status-soon {
+      color: rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .card-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .card-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .card-desc {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Coming soon overlay */
+    .app-card.coming-soon {
+      cursor: default;
+    }
+
+    .app-card.coming-soon .card-icon,
+    .app-card.coming-soon .card-title,
+    .app-card.coming-soon .card-desc,
+    .app-card.coming-soon .card-tags {
+      opacity: 0.4;
+    }
+
+    .app-card.coming-soon:hover {
+      transform: translateY(-4px);
+    }
+
+    /* Glitch text on hover */
+    .app-card:not(.coming-soon):hover .card-title {
+      animation: glitchText 0.3s steps(2) forwards;
+    }
+
+    @keyframes glitchText {
+      0% { text-shadow: 2px 0 #00ffc8, -2px 0 #ff00aa; }
+      25% { text-shadow: -2px 0 #00ffc8, 2px 0 #ff00aa; }
+      50% { text-shadow: 1px 0 #00ffc8, -1px 0 #ff00aa; }
+      100% { text-shadow: none; }
+    }
+
+    /* === FOOTER === */
+    .footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 20px 60px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .footer-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer-text a {
+      color: #00ffc8;
+      text-decoration: none;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 640px) {
+      .header { padding: 60px 16px 16px; }
+      .app-grid {
+        grid-template-columns: 1fr;
+        padding: 0 16px 60px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="grid"></div>
-
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+  <div class="scanline"></div>
   <div class="particles" id="particles"></div>
 
-  <div class="container">
-    <div class="card">
-      <div class="label">Welcome to the universe</div>
-      <div class="hello" id="hello">Hello,</div>
-      <div class="world" id="world">World.</div>
-      <div class="divider"></div>
-      <div class="subtitle">Click anywhere to feel the magic ✦</div>
-      <div class="dots">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo-badge">System Online</div>
+    <h1 class="main-title">VIBE APPS</h1>
+    <p class="subtitle">Experimental apps crafted with <span>vibe coding</span></p>
+  </header>
+
+  <div class="hline"></div>
+
+  <!-- APP GRID -->
+  <section class="app-grid">
+
+    <!-- FETCH BABY — LIVE -->
+    <a href="https://vibe.hieu.website/fetch-baby" class="app-card" style="--card-accent: #00ffc8; --card-glow: rgba(0, 255, 200, 0.15);">
+      <div class="card-status status-live">Live</div>
+      <div class="card-icon">🍼</div>
+      <div class="card-title">Fetch Baby</div>
+      <div class="card-desc">Theo dõi cữ ăn, giấc ngủ và hoạt động hàng ngày của bé yêu. PWA hỗ trợ offline.</div>
+      <div class="card-tags">
+        <span class="tag">PWA</span>
+        <span class="tag">Offline</span>
+        <span class="tag">Tracker</span>
+      </div>
+    </a>
+
+    <!-- COMING SOON 1 -->
+    <div class="app-card coming-soon" style="--card-accent: #7c3aed; --card-glow: rgba(124, 58, 237, 0.12);">
+      <div class="card-status status-soon">Coming Soon</div>
+      <div class="card-icon">🧠</div>
+      <div class="card-title">???</div>
+      <div class="card-desc">Ý tưởng tiếp theo đang được ấp ủ... Stay tuned for the next experiment.</div>
+      <div class="card-tags">
+        <span class="tag">Mystery</span>
+        <span class="tag">TBD</span>
       </div>
     </div>
-  </div>
+
+
+    <!-- COMING SOON 2 -->
+    <div class="app-card coming-soon" style="--card-accent: #00a8ff; --card-glow: rgba(0, 168, 255, 0.12);">
+      <div class="card-status status-soon">Coming Soon</div>
+      <div class="card-icon">⚡</div>
+      <div class="card-title">???</div>
+      <div class="card-desc">Ý tưởng tiếp theo đang được ấp ủ... Stay tuned for the next experiment.</div>
+      <div class="card-tags">
+        <span class="tag">Mystery</span>
+        <span class="tag">TBD</span>
+      </div>
+    </div>
+
+    <!-- COMING SOON 3 -->
+    <div class="app-card coming-soon" style="--card-accent: #ff6b6b; --card-glow: rgba(255, 107, 107, 0.12);">
+      <div class="card-status status-soon">Coming Soon</div>
+      <div class="card-icon">🎵</div>
+      <div class="card-title">???</div>
+      <div class="card-desc">Ý tưởng tiếp theo đang được ấp ủ... Stay tuned for the next experiment.</div>
+      <div class="card-tags">
+        <span class="tag">Mystery</span>
+        <span class="tag">TBD</span>
+      </div>
+    </div>
+
+    <!-- COMING SOON 4 -->
+    <div class="app-card coming-soon" style="--card-accent: #ffc107; --card-glow: rgba(255, 193, 7, 0.12);">
+      <div class="card-status status-soon">Coming Soon</div>
+      <div class="card-icon">📊</div>
+      <div class="card-title">???</div>
+      <div class="card-desc">Ý tưởng tiếp theo đang được ấp ủ... Stay tuned for the next experiment.</div>
+      <div class="card-tags">
+        <span class="tag">Mystery</span>
+        <span class="tag">TBD</span>
+      </div>
+    </div>
+
+    <!-- COMING SOON 5 -->
+    <div class="app-card coming-soon" style="--card-accent: #e040fb; --card-glow: rgba(224, 64, 251, 0.12);">
+      <div class="card-status status-soon">Coming Soon</div>
+      <div class="card-icon">🚀</div>
+      <div class="card-title">???</div>
+      <div class="card-desc">Ý tưởng tiếp theo đang được ấp ủ... Stay tuned for the next experiment.</div>
+      <div class="card-tags">
+        <span class="tag">Mystery</span>
+        <span class="tag">TBD</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p class="footer-text">Built with vibes by <a href="https://github.com/huynhtronghieu" target="_blank">HieuHT</a></p>
+  </footer>
 
   <script>
-    // --- Floating particles ---
+    // Floating particles
     const particlesEl = document.getElementById('particles');
-    const PARTICLE_COUNT = 40;
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    for (let i = 0; i < 50; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
       p.style.left = Math.random() * 100 + 'vw';
-      p.style.width = p.style.height = (Math.random() * 3 + 1) + 'px';
-      p.style.animationDuration = (Math.random() * 12 + 8) + 's';
-      p.style.animationDelay  = (Math.random() * 12) + 's';
-      const hue = [270, 220, 330][Math.floor(Math.random() * 3)];
-      p.style.background = `hsla(${hue}, 80%, 70%, 0.7)`;
+      p.style.width = p.style.height = (Math.random() * 2 + 1) + 'px';
+      p.style.animationDuration = (Math.random() * 14 + 8) + 's';
+      p.style.animationDelay = (Math.random() * 14) + 's';
+      const colors = ['rgba(0,255,200,0.5)', 'rgba(124,58,237,0.5)', 'rgba(0,168,255,0.5)'];
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
       particlesEl.appendChild(p);
     }
 
-    // --- Click ripple effect ---
-    document.addEventListener('click', (e) => {
-      const ripple = document.createElement('div');
-      const size = 60;
-      ripple.className = 'ripple';
-      ripple.style.cssText = `
-        width: ${size}px;
-        height: ${size}px;
-        top: ${e.clientY - size / 2}px;
-        left: ${e.clientX - size / 2}px;
-      `;
-      document.body.appendChild(ripple);
-      requestAnimationFrame(() => ripple.classList.add('active'));
-      ripple.addEventListener('animationend', () => ripple.remove());
-
-      // Spawn burst particles
-      for (let i = 0; i < 8; i++) {
-        const burst = document.createElement('div');
-        burst.style.cssText = `
-          position: fixed;
-          width: 4px; height: 4px;
-          border-radius: 50%;
-          background: hsl(${Math.random() * 60 + 250}, 90%, 70%);
-          left: ${e.clientX}px;
-          top: ${e.clientY}px;
-          pointer-events: none;
-          z-index: 999;
-          transition: transform 0.8s ease-out, opacity 0.8s ease-out;
-        `;
-        document.body.appendChild(burst);
-        const angle = (i / 8) * Math.PI * 2;
-        const dist  = 60 + Math.random() * 60;
-        requestAnimationFrame(() => {
-          burst.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(0)`;
-          burst.style.opacity = '0';
-        });
-        setTimeout(() => burst.remove(), 800);
-      }
-    });
-
-    // --- Typing easter egg on hover ---
-    const helloEl = document.getElementById('hello');
-    const messages = ['Hello,', 'Xin chào,', 'こんにちは,', 'Bonjour,', 'Hola,', '안녕하세요,'];
-    let msgIndex = 0;
-    let typing = false;
-
-    helloEl.addEventListener('mouseenter', () => {
-      if (typing) return;
-      typing = true;
-      msgIndex = (msgIndex + 1) % messages.length;
-      const target = messages[msgIndex];
-      let i = 0;
-      helloEl.textContent = '';
-      const iv = setInterval(() => {
-        helloEl.textContent = target.slice(0, ++i);
-        if (i >= target.length) { clearInterval(iv); typing = false; }
-      }, 60);
-    });
-
-    // --- Subtle parallax on mouse move ---
-    document.addEventListener('mousemove', (e) => {
-      const cx = window.innerWidth  / 2;
-      const cy = window.innerHeight / 2;
-      const dx = (e.clientX - cx) / cx;
-      const dy = (e.clientY - cy) / cy;
-      document.querySelector('.card').style.transform =
-        `perspective(800px) rotateY(${dx * 6}deg) rotateX(${-dy * 6}deg)`;
-    });
-
-    document.addEventListener('mouseleave', () => {
-      document.querySelector('.card').style.transform = '';
+    // Card tilt effect
+    document.querySelectorAll('.app-card:not(.coming-soon)').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `translateY(-8px) perspective(600px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
     });
   </script>
 </body>

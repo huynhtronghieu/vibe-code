@@ -1,369 +1,2549 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#5B9BD5">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍼</text></svg>">
+<title>Theo dõi cữ ăn bé</title>
+<style>
+:root {
+  --primary: #5B9BD5;
+  --primary-light: #D6E8F7;
+  --accent: #FF8FA3;
+  --accent-light: #FFD6DE;
+  --success: #7BC67E;
+  --warning: #FFB347;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #2D3436;
+  --text-light: #636E72;
+  --border: #E0E6ED;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --radius: 16px;
+}
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0a0a0f;
-      overflow: hidden;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* Animated background grid */
-    .grid {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(100, 60, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(100, 60, 255, 0.07) 1px, transparent 1px);
-      background-size: 60px 60px;
-      animation: gridMove 20s linear infinite;
-    }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    @keyframes gridMove {
-      0%   { transform: translateY(0); }
-      100% { transform: translateY(60px); }
-    }
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* Floating orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.35;
-      animation: float 8s ease-in-out infinite alternate;
-    }
+#welcome {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
 
-    .orb-1 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, #7c3aed, transparent 70%);
-      top: -100px; left: -100px;
-      animation-delay: 0s;
-    }
+#welcome h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: var(--primary);
+}
 
-    .orb-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, #2563eb, transparent 70%);
-      bottom: -80px; right: -80px;
-      animation-delay: -3s;
-    }
+#welcome p {
+  color: var(--text-light);
+  margin-bottom: 32px;
+  font-size: 15px;
+}
 
-    .orb-3 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, #db2777, transparent 70%);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation-delay: -6s;
-    }
+.welcome-form {
+  width: 100%;
+  max-width: 360px;
+}
 
-    @keyframes float {
-      0%   { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(30px, 40px) scale(1.1); }
-    }
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
 
-    /* Main container */
-    .container {
-      position: relative;
-      text-align: center;
-      z-index: 10;
-    }
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-light);
+}
 
-    /* Glowing card */
-    .card {
-      position: relative;
-      padding: 60px 80px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.05),
-        0 40px 80px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255,255,255,0.1);
-    }
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
 
-    /* Animated border gradient */
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border-radius: 25px;
-      background: linear-gradient(135deg, #7c3aed, #2563eb, #db2777, #7c3aed);
-      background-size: 300% 300%;
-      animation: borderRotate 4s linear infinite;
-      z-index: -1;
-      opacity: 0.6;
-    }
+.form-group input:focus {
+  border-color: var(--primary);
+}
 
-    .card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 24px;
-      background: rgba(10, 10, 15, 0.95);
-      z-index: -1;
-    }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+}
 
-    @keyframes borderRotate {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+.btn:active { transform: scale(0.97); }
 
-    /* Greeting label */
-    .label {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: rgba(200, 160, 255, 0.7);
-      margin-bottom: 20px;
-      padding: 6px 16px;
-      border: 1px solid rgba(124, 58, 237, 0.3);
-      border-radius: 100px;
-      background: rgba(124, 58, 237, 0.1);
-    }
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  width: 100%;
+}
 
-    /* Main text */
-    .hello {
-      font-size: clamp(56px, 10vw, 100px);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -3px;
-      background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #818cf8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
-    }
+#dashboard {
+  padding-bottom: 80px;
+}
 
-    .world {
-      font-size: clamp(56px, 10vw, 100px);
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -3px;
-      background: linear-gradient(135deg, #f472b6 0%, #a78bfa 50%, #60a5fa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s ease-in-out infinite;
-    }
+.header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 20px 24px;
+  border-radius: 0 0 24px 24px;
+}
 
-    @keyframes shimmer {
-      0%, 100% { filter: brightness(1); }
-      50%       { filter: brightness(1.3); }
-    }
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
 
-    /* Subtitle */
-    .subtitle {
-      margin-top: 24px;
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.35);
-      letter-spacing: 1px;
-    }
+.baby-name {
+  font-size: 22px;
+  font-weight: 700;
+}
 
-    /* Divider */
-    .divider {
-      margin: 32px auto;
-      width: 60px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.6), transparent);
-    }
+.baby-age {
+  font-size: 13px;
+  opacity: 0.85;
+}
 
-    /* Particle dots */
-    .dots {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 28px;
-    }
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #7c3aed;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
+.prediction-card {
+  background: var(--card);
+  margin: -12px 16px 16px;
+  padding: 18px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  position: relative;
+  z-index: 1;
+  border-left: 4px solid var(--primary);
+}
 
-    .dot:nth-child(2) { animation-delay: 0.2s; background: #2563eb; }
-    .dot:nth-child(3) { animation-delay: 0.4s; background: #db2777; }
+.prediction-card.overdue {
+  border-left-color: var(--accent);
+}
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50%       { transform: scale(1.6); opacity: 1; }
-    }
+.prediction-label {
+  font-size: 11px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
 
-    /* Floating particles */
-    .particles {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 5;
-    }
+.prediction-time {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+}
 
-    .particle {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      border-radius: 50%;
-      background: rgba(167, 139, 250, 0.6);
-      animation: rise linear infinite;
-    }
+.prediction-card.overdue .prediction-time {
+  color: var(--accent);
+}
 
-    @keyframes rise {
-      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-    }
+.prediction-detail {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
 
-    /* Click ripple */
-    .ripple {
-      position: fixed;
-      border-radius: 50%;
-      border: 2px solid rgba(167, 139, 250, 0.6);
-      transform: scale(0);
-      pointer-events: none;
-      z-index: 20;
-    }
+.prediction-countdown {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+}
 
-    .ripple.active {
-      animation: rippleOut 0.8s ease-out forwards;
-    }
+.prediction-card.overdue .prediction-countdown {
+  color: var(--accent);
+}
 
-    @keyframes rippleOut {
-      to { transform: scale(6); opacity: 0; }
-    }
-  </style>
+.prediction-last {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 8px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+  padding: 8px 20px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-row {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.summary-card {
+  flex: 1;
+  background: var(--card);
+  padding: 14px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.feeding-list {
+  padding: 0 16px;
+}
+
+.feeding-item {
+  background: var(--card);
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feeding-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.feeding-icon.formula { background: var(--primary-light); }
+.feeding-icon.breast_milk { background: var(--accent-light); }
+.feeding-icon.nursing { background: #FFF3E0; }
+.feeding-icon.solid { background: #E8F5E9; }
+
+.feeding-info { flex: 1; min-width: 0; }
+
+.feeding-type {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.feeding-detail {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feeding-time {
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.feeding-delete {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.feeding-delete:active { color: var(--accent); }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--card);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 0;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+  cursor: pointer;
+}
+
+.modal h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.type-btn {
+  padding: 14px 10px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.type-btn .type-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.type-btn.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.amount-section, .nursing-section, .solid-section {
+  margin-bottom: 20px;
+}
+
+.amount-display {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.amount-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.amount-unit {
+  font-size: 18px;
+  color: var(--text-light);
+  margin-left: 4px;
+}
+
+.amount-hint {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.amount-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.amount-btn {
+  min-width: 56px;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.amount-btn:active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.quick-amounts {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+.quick-btn:active { background: var(--primary-light); }
+
+.side-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.side-btn {
+  flex: 1;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.side-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.duration-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.duration-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 80px;
+  text-align: center;
+}
+
+.duration-unit {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.duration-btn {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.duration-btn:active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.nursing-estimate {
+  text-align: center;
+  margin-top: 12px;
+  padding: 10px;
+  background: var(--primary-light);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.nursing-timer {
+  text-align: center;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  border-radius: 14px;
+  border: 2px solid var(--warning);
+}
+
+.nursing-timer-label {
+  font-size: 12px;
+  color: var(--warning);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.nursing-timer-value {
+  font-size: 42px;
+  font-weight: 800;
+  color: #E65100;
+  font-variant-numeric: tabular-nums;
+}
+
+.nursing-timer .recording-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E53935;
+  margin-right: 6px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.solid-section input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.solid-section input:focus { border-color: var(--primary); }
+
+.time-section {
+  margin-bottom: 20px;
+}
+
+.time-section label {
+  font-size: 13px;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.time-section input[type="datetime-local"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+.time-section input[type="datetime-local"]:focus {
+  border-color: var(--primary);
+}
+
+.backfill-hint {
+  font-size: 12px;
+  color: var(--warning);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.note-section {
+  margin-bottom: 20px;
+}
+
+.note-section textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  resize: none;
+  height: 60px;
+}
+
+.note-section textarea:focus { border-color: var(--primary); }
+
+.save-btn {
+  width: 100%;
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  position: sticky;
+  bottom: 0;
+  margin-top: 12px;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.save-btn:active { opacity: 0.9; }
+
+#history {
+  padding-bottom: 80px;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 12px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text);
+  padding: 4px;
+}
+
+.history-header h2 {
+  font-size: 20px;
+  flex: 1;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 20px 16px;
+}
+
+.date-nav-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--text-light);
+  padding: 8px;
+}
+
+.date-nav-label {
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
+}
+
+.history-summary {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.history-list {
+  padding: 0 16px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  z-index: 50;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px 12px;
+}
+
+.nav-btn .nav-icon { font-size: 22px; }
+.nav-btn.active { color: var(--primary); font-weight: 600; }
+
+.nav-add { position: relative; }
+.nav-add-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 28px;
+  font-weight: 400;
+  margin-top: -26px;
+  box-shadow: 0 2px 10px rgba(255,143,163,0.4);
+}
+.nav-add { color: var(--accent) !important; font-weight: 600 !important; }
+
+.nav-nurse-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--warning);
+  color: white;
+  font-size: 22px;
+  margin-top: -26px;
+  box-shadow: 0 2px 10px rgba(255,179,71,0.4);
+}
+.nav-nurse { position: relative; color: var(--warning) !important; font-weight: 600 !important; }
+.nav-nurse.recording .nav-nurse-icon {
+  background: #E53935;
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 2px 10px rgba(229,57,53,0.5);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.settings-content {
+  padding: 0 16px 16px;
+}
+
+.settings-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-item:last-child { border-bottom: none; }
+
+.settings-item label {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.settings-item input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+.settings-item input:focus { border-color: var(--primary); }
+
+.danger-btn {
+  background: #FFE0E0;
+  color: #D32F2F;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.standard-bar {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0 16px 12px;
+  font-size: 13px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.standard-bar strong {
+  color: var(--primary);
+}
+
+.hidden { display: none !important; }
+
+/* Import confirmation screen */
+#importConfirm, #safariCopyCode {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+#importConfirm h1, #safariCopyCode h1 {
+  font-size: 24px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+#importConfirm p, #safariCopyCode p {
+  color: var(--text-light);
+  margin-bottom: 24px;
+  font-size: 15px;
+}
+
+.import-info {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 360px;
+  text-align: left;
+}
+
+.import-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.import-info-row:last-child { border-bottom: none; }
+.import-info-label { color: var(--text-light); }
+.import-info-value { font-weight: 600; }
+
+.import-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-light);
+  border: 2px solid var(--border);
+  width: 100%;
+}
+
+/* Share link display */
+.share-link-box {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+  word-break: break-all;
+  font-size: 12px;
+  color: var(--text-light);
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.share-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.share-actions .btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* Chart styles */
+.chart-range-selector {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.chart-range-btn {
+  padding: 6px 18px;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+.chart-range-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.chart-container {
+  padding: 0 16px 16px;
+}
+
+.chart-container canvas {
+  width: 100%;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+/* Update toast */
+.update-toast {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  background: var(--primary);
+  color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.update-toast button {
+  background: white;
+  color: var(--primary);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+</style>
 </head>
 <body>
 
-  <div class="grid"></div>
+<!-- WELCOME -->
+<div id="welcome" class="screen active">
+  <h1>Theo dõi cữ ăn bé</h1>
+  <p>Nhập thông tin bé để bắt đầu</p>
+  <div class="welcome-form">
+    <div class="form-group">
+      <label>Tên bé</label>
+      <input type="text" id="babyName" placeholder="VD: Bé Na" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Ngày sinh</label>
+      <input type="date" id="babyDob">
+    </div>
+    <button class="btn btn-primary" onclick="saveBaby()">Bắt đầu</button>
+  </div>
+</div>
 
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+<!-- IMPORT CONFIRMATION (in-app) -->
+<div id="importConfirm" class="screen">
+  <h1>Nhận dữ liệu</h1>
+  <p>Ai đó đã chia sẻ dữ liệu cữ ăn với bạn</p>
+  <div class="import-info" id="importInfo"></div>
+  <div class="import-actions">
+    <button class="btn btn-primary" onclick="confirmUrlImport()">Nhập dữ liệu này</button>
+    <button class="btn btn-outline" onclick="cancelUrlImport()">Bỏ qua</button>
+  </div>
+</div>
 
-  <div class="particles" id="particles"></div>
+<!-- SAFARI COPY CODE (when opened in browser, not PWA) -->
+<div id="safariCopyCode" class="screen">
+  <h1>Mở trong ứng dụng</h1>
+  <p>Link này cần được nhập trong ứng dụng (PWA).<br>Sao chép mã bên dưới, mở app rồi dán vào.</p>
+  <div class="import-info" id="safariImportInfo"></div>
+  <div class="import-actions">
+    <div class="share-link-box" id="safariCodeBox" style="margin-bottom:12px;font-size:11px;max-height:60px"></div>
+    <button class="btn btn-primary" onclick="copySafariCode()">Sao chép mã dữ liệu</button>
+    <p id="safariCopyStatus" style="color:var(--success);font-size:13px;margin-top:8px;display:none">Đã sao chép! Mở app và vào Cài đặt > Nhập từ mã</p>
+    <button class="btn btn-outline" style="margin-top:8px" onclick="confirmUrlImport()">Hoặc nhập ngay tại đây</button>
+  </div>
+</div>
 
-  <div class="container">
-    <div class="card">
-      <div class="label">Welcome to the universe</div>
-      <div class="hello" id="hello">Hello,</div>
-      <div class="world" id="world">World.</div>
-      <div class="divider"></div>
-      <div class="subtitle">Click anywhere to feel the magic ✦</div>
-      <div class="dots">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+<!-- DASHBOARD -->
+<div id="dashboard" class="screen">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="baby-name" id="dashName"></div>
+        <div class="baby-age" id="dashAge"></div>
       </div>
+      <button class="header-btn" onclick="openSettings()">&#9881;</button>
     </div>
   </div>
 
-  <script>
-    // --- Floating particles ---
-    const particlesEl = document.getElementById('particles');
-    const PARTICLE_COUNT = 40;
+  <div class="prediction-card" id="predictionCard">
+    <div class="prediction-label">Cữ ăn tiếp theo dự kiến</div>
+    <div class="prediction-time" id="predictionTime">--:--</div>
+    <div class="prediction-countdown" id="predictionCountdown"></div>
+    <div class="prediction-detail" id="predictionDetail"></div>
+    <div class="prediction-last" id="predictionLast"></div>
+  </div>
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = Math.random() * 100 + 'vw';
-      p.style.width = p.style.height = (Math.random() * 3 + 1) + 'px';
-      p.style.animationDuration = (Math.random() * 12 + 8) + 's';
-      p.style.animationDelay  = (Math.random() * 12) + 's';
-      const hue = [270, 220, 330][Math.floor(Math.random() * 3)];
-      p.style.background = `hsla(${hue}, 80%, 70%, 0.7)`;
-      particlesEl.appendChild(p);
+  <div class="standard-bar" id="standardBar"></div>
+
+  <div class="section-title">Hôm nay</div>
+  <div class="summary-row" id="summaryRow">
+    <div class="summary-card">
+      <div class="summary-value" id="totalMl" style="color:var(--primary)">0</div>
+      <div class="summary-label">ml sữa</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value" id="totalFeeds" style="color:var(--accent)">0</div>
+      <div class="summary-label">cữ ăn</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-value" id="totalNursing" style="color:var(--warning)">0</div>
+      <div class="summary-label">phút bú</div>
+      <div class="summary-label" id="nursingEstMl" style="color:var(--primary);font-weight:600;margin-top:2px"></div>
+    </div>
+  </div>
+
+  <div class="section-title">Các cữ ăn hôm nay</div>
+  <div class="feeding-list" id="feedingList"></div>
+
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="screen">
+  <div class="history-header">
+    <button class="back-btn" onclick="showScreen('dashboard')">&larr;</button>
+    <h2>Lịch sử</h2>
+  </div>
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="changeHistoryDate(-1)">&lsaquo;</button>
+    <div class="date-nav-label" id="historyDateLabel"></div>
+    <button class="date-nav-btn" onclick="changeHistoryDate(1)">&rsaquo;</button>
+  </div>
+  <div class="chart-range-selector" id="chartRangeSelector">
+    <button class="chart-range-btn active" data-range="week" onclick="setChartRange('week')">Tuần</button>
+    <button class="chart-range-btn" data-range="month" onclick="setChartRange('month')">Tháng</button>
+  </div>
+  <div class="chart-container" id="chartContainer">
+    <canvas id="historyChart"></canvas>
+  </div>
+  <div class="summary-row history-summary" id="historySummary"></div>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<!-- ADD FEEDING MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-handle" onclick="closeAddModal()"></div>
+    <h2>Thêm cữ ăn</h2>
+
+    <div class="type-selector" id="typeSelector">
+      <button class="type-btn" data-type="formula" onclick="selectType('formula')">
+        <span class="type-icon">&#127868;</span>Sữa công thức
+      </button>
+      <button class="type-btn" data-type="breast_milk" onclick="selectType('breast_milk')">
+        <span class="type-icon">&#127860;</span>Sữa mẹ (bình)
+      </button>
+      <button class="type-btn" data-type="nursing" onclick="selectType('nursing')">
+        <span class="type-icon">&#129329;</span>Bú mẹ
+      </button>
+      <button class="type-btn" data-type="solid" onclick="selectType('solid')">
+        <span class="type-icon">&#127858;</span>Ăn dặm
+      </button>
+    </div>
+
+    <!-- Milk amount -->
+    <div class="amount-section" id="amountSection">
+      <div class="amount-display">
+        <span class="amount-value" id="amountValue">0</span>
+        <span class="amount-unit">ml</span>
+        <div class="amount-hint" id="amountHint"></div>
+      </div>
+      <div class="amount-controls">
+        <button class="amount-btn" onclick="adjustAmount(-30)">-30</button>
+        <button class="amount-btn" onclick="adjustAmount(-10)">-10</button>
+        <button class="amount-btn" onclick="adjustAmount(10)">+10</button>
+        <button class="amount-btn" onclick="adjustAmount(30)">+30</button>
+      </div>
+      <div class="quick-amounts" id="quickAmounts"></div>
+    </div>
+
+    <!-- Nursing -->
+    <div class="nursing-section hidden" id="nursingSection">
+      <div class="nursing-timer hidden" id="nursingTimer">
+        <div class="nursing-timer-label"><span class="recording-dot"></span>Đang bú</div>
+        <div class="nursing-timer-value" id="nursingTimerValue">00:00</div>
+      </div>
+      <div class="side-selector">
+        <button class="side-btn" data-side="left" onclick="selectSide('left')">Trái</button>
+        <button class="side-btn" data-side="right" onclick="selectSide('right')">Phải</button>
+        <button class="side-btn" data-side="both" onclick="selectSide('both')">Cả hai</button>
+      </div>
+      <div class="duration-controls">
+        <button class="duration-btn" onclick="adjustDuration(-5)">-</button>
+        <div>
+          <span class="duration-value" id="durationValue">10</span>
+          <div class="duration-unit">phút</div>
+        </div>
+        <button class="duration-btn" onclick="adjustDuration(5)">+</button>
+      </div>
+      <div class="nursing-estimate" id="nursingEstimate"></div>
+    </div>
+
+    <!-- Solid food -->
+    <div class="solid-section hidden" id="solidSection">
+      <input type="text" id="foodName" placeholder="Loại thức ăn (VD: cháo bí đỏ)">
+      <div class="amount-display">
+        <span class="amount-value" id="solidAmount">0</span>
+        <span class="amount-unit">ml</span>
+      </div>
+      <div class="amount-controls">
+        <button class="amount-btn" onclick="adjustSolidAmount(-10)">-10</button>
+        <button class="amount-btn" onclick="adjustSolidAmount(-5)">-5</button>
+        <button class="amount-btn" onclick="adjustSolidAmount(5)">+5</button>
+        <button class="amount-btn" onclick="adjustSolidAmount(10)">+10</button>
+      </div>
+    </div>
+
+    <div class="time-section">
+      <label>Thời gian (chỉnh lại nếu nhập bù)</label>
+      <input type="datetime-local" id="feedingTime">
+      <div class="backfill-hint" id="backfillHint" style="display:none">
+        ⏰ Đang nhập bù cho thời gian khác hiện tại
+      </div>
+    </div>
+
+    <div class="note-section">
+      <textarea id="feedingNote" placeholder="Ghi chú (tuỳ chọn)"></textarea>
+    </div>
+
+    <button class="save-btn" onclick="saveFeeding()">Lưu cữ ăn</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-handle" onclick="closeSettings()"></div>
+    <h2>Cài đặt</h2>
+    <div class="settings-content">
+      <div class="settings-item">
+        <label>Tên bé</label>
+        <input type="text" id="settingsName">
+      </div>
+      <div class="settings-item">
+        <label>Ngày sinh</label>
+        <input type="date" id="settingsDob">
+      </div>
+      <div class="settings-item">
+        <button class="btn btn-primary" onclick="updateBaby()" style="margin-bottom:12px">Lưu thay đổi</button>
+        <button class="danger-btn" style="background:#E8F5E9;color:#2E7D32" onclick="shareData()">Chia sẻ dữ liệu qua link</button>
+        <div id="shareResult" style="display:none">
+          <div class="share-link-box" id="shareLinkBox"></div>
+          <div class="share-actions">
+            <button class="btn btn-primary" onclick="copyShareLink()">Sao chép</button>
+            <button class="btn btn-outline" onclick="nativeShare()">Chia sẻ</button>
+          </div>
+        </div>
+        <button class="danger-btn" style="margin-top:8px;background:#E3F2FD;color:#1565C0" onclick="showImportCode()">Nhập dữ liệu từ mã</button>
+        <div id="importCodeSection" style="display:none;margin-top:8px">
+          <textarea id="importCodeInput" style="width:100%;padding:10px;border:2px solid var(--border);border-radius:10px;font-size:12px;height:60px;resize:none;font-family:monospace" placeholder="Dán mã dữ liệu vào đây..."></textarea>
+          <button class="btn btn-primary" style="margin-top:8px" onclick="importFromCode()">Nhập dữ liệu</button>
+        </div>
+        <button class="danger-btn" style="margin-top:8px" onclick="resetAll()">Xoá toàn bộ &amp; bắt đầu lại</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<div class="bottom-nav hidden" id="bottomNav">
+  <button class="nav-btn active" id="navDashboard" onclick="showScreen('dashboard')">
+    <span class="nav-icon">&#127968;</span>
+    Trang chủ
+  </button>
+  <button class="nav-btn nav-nurse" id="navNurse" onclick="toggleNursing()">
+    <span class="nav-icon nav-nurse-icon">&#129329;</span>
+    <span id="navNurseLabel">Bắt đầu bú</span>
+  </button>
+  <button class="nav-btn nav-add" id="navAdd" onclick="openAddModal()">
+    <span class="nav-icon nav-add-icon">+</span>
+    Thêm cữ ăn
+  </button>
+  <button class="nav-btn" id="navHistory" onclick="showScreen('history')">
+    <span class="nav-icon">&#128197;</span>
+    Lịch sử
+  </button>
+</div>
+
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+<script>
+// ===== CHUẨN Y KHOA =====
+const FEEDING_STANDARDS = [
+  { maxDays: 7,    label: 'Sơ sinh (0-7 ngày)',  mlMin: 30,  mlMax: 60,  feedsMin: 8,  feedsMax: 12, intervalMin: 2,   intervalMax: 3   },
+  { maxDays: 28,   label: '2-4 tuần',            mlMin: 60,  mlMax: 90,  feedsMin: 7,  feedsMax: 9,  intervalMin: 2.5, intervalMax: 3   },
+  { maxDays: 60,   label: '1-2 tháng',           mlMin: 90,  mlMax: 120, feedsMin: 6,  feedsMax: 8,  intervalMin: 3,   intervalMax: 3.5 },
+  { maxDays: 120,  label: '2-4 tháng',           mlMin: 120, mlMax: 150, feedsMin: 5,  feedsMax: 6,  intervalMin: 3,   intervalMax: 4   },
+  { maxDays: 180,  label: '4-6 tháng',           mlMin: 150, mlMax: 180, feedsMin: 5,  feedsMax: 6,  intervalMin: 3.5, intervalMax: 4   },
+  { maxDays: 270,  label: '6-9 tháng',           mlMin: 180, mlMax: 240, feedsMin: 4,  feedsMax: 5,  intervalMin: 4,   intervalMax: 5   },
+  { maxDays: 365,  label: '9-12 tháng',          mlMin: 180, mlMax: 240, feedsMin: 3,  feedsMax: 4,  intervalMin: 4,   intervalMax: 5   },
+  { maxDays: 99999,label: 'Trên 12 tháng',       mlMin: 150, mlMax: 200, feedsMin: 2,  feedsMax: 3,  intervalMin: 5,   intervalMax: 6   },
+];
+
+// ===== STATE =====
+let db = null;
+let baby = null;
+let currentType = 'formula';
+let currentAmount = 0;
+let currentDuration = 10;
+let currentSide = 'left';
+let currentSolidAmount = 0;
+let historyDate = new Date();
+let nursingMlPerMinute = 0; // calculated from history
+let nursingStartTime = null; // timestamp when nursing recording started
+let nursingTimerInterval = null; // interval for updating timer display
+let chartRange = 'week'; // 'week' or 'month'
+
+// ===== INDEXEDDB =====
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('BabyFeedingTracker', 2);
+    req.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('baby')) {
+        d.createObjectStore('baby', { keyPath: 'id' });
+      }
+      if (!d.objectStoreNames.contains('feedings')) {
+        const store = d.createObjectStore('feedings', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbPut(storeName, data) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).put(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function dbGetAll(storeName) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readonly');
+    const req = tx.objectStore(storeName).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbDelete(storeName, key) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function dbClear(storeName) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    tx.objectStore(storeName).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// ===== HELPERS =====
+function getAgeDays() {
+  if (!baby) return 0;
+  const dob = new Date(baby.dob);
+  return Math.floor((new Date() - dob) / 86400000);
+}
+
+function getAgeText() {
+  const days = getAgeDays();
+  if (days < 7) return days + ' ngày tuổi';
+  if (days < 30) return Math.floor(days / 7) + ' tuần tuổi';
+  const months = Math.floor(days / 30);
+  const rd = days % 30;
+  if (months < 12) return months + ' tháng ' + rd + ' ngày';
+  return Math.floor(months / 12) + ' tuổi ' + (months % 12) + ' tháng';
+}
+
+function getStandard() {
+  const days = getAgeDays();
+  return FEEDING_STANDARDS.find(s => days <= s.maxDays) || FEEDING_STANDARDS[FEEDING_STANDARDS.length - 1];
+}
+
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDate(date) {
+  const d = new Date(date);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return 'Hôm nay';
+  if (d.toDateString() === yesterday.toDateString()) return 'Hôm qua';
+  return d.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'numeric' });
+}
+
+function startOfDay(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function endOfDay(date) {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
+function toLocalDatetimeString(date) {
+  const d = new Date(date);
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function typeLabel(type) {
+  return { formula: 'Sữa công thức', breast_milk: 'Sữa mẹ (bình)', nursing: 'Bú mẹ', solid: 'Ăn dặm' }[type] || type;
+}
+
+function typeIcon(type) {
+  return { formula: '🍼', breast_milk: '🍼', nursing: '🤱', solid: '🍞' }[type] || '🍽';
+}
+
+// ===== NURSING TO ML ESTIMATION =====
+// Uses medical standards: avg ml per feed for baby's age ÷ typical full nursing session (15-20 min)
+// This is more reliable than personal history which can be inaccurate
+function calculateNursingMlPerMinute(allFeedings) {
+  var std = getStandard();
+  var avgStdMl = (std.mlMin + std.mlMax) / 2;
+  // Typical full nursing session duration varies by age:
+  // Newborns: 20-30 min, older babies: 10-15 min
+  var days = getAgeDays();
+  var typicalSessionMin;
+  if (days <= 28) {
+    typicalSessionMin = 20; // newborns nurse longer
+  } else if (days <= 120) {
+    typicalSessionMin = 15; // 1-4 months
+  } else {
+    typicalSessionMin = 12; // 4+ months, more efficient
+  }
+  nursingMlPerMinute = avgStdMl / typicalSessionMin;
+  return nursingMlPerMinute;
+}
+
+function estimateNursingMl(durationMinutes) {
+  return Math.round(nursingMlPerMinute * durationMinutes);
+}
+
+function updateNursingEstimate() {
+  var el = document.getElementById('nursingEstimate');
+  if (!el) return;
+  var estMl = estimateNursingMl(currentDuration);
+  if (nursingMlPerMinute > 0) {
+    el.textContent = '≈ ' + estMl + ' ml (theo chuẩn y khoa)';
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// ===== SCREENS =====
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navBtn = document.getElementById('nav' + name.charAt(0).toUpperCase() + name.slice(1));
+  if (navBtn) navBtn.classList.add('active');
+  if (name === 'dashboard') refreshDashboard();
+  if (name === 'history') refreshHistory();
+}
+
+// ===== BABY =====
+async function saveBaby() {
+  const name = document.getElementById('babyName').value.trim();
+  const dob = document.getElementById('babyDob').value;
+  if (!name || !dob) { alert('Vui lòng nhập đầy đủ thông tin'); return; }
+  baby = { id: 1, name: name, dob: dob };
+  await dbPut('baby', baby);
+  document.getElementById('bottomNav').classList.remove('hidden');
+  showScreen('dashboard');
+}
+
+async function loadBaby() {
+  const babies = await dbGetAll('baby');
+  if (babies.length > 0) {
+    baby = babies[0];
+    document.getElementById('bottomNav').classList.remove('hidden');
+    showScreen('dashboard');
+  }
+}
+
+function openSettings() {
+  document.getElementById('settingsName').value = baby.name;
+  document.getElementById('settingsDob').value = baby.dob;
+  document.getElementById('settingsModal').classList.add('active');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+async function updateBaby() {
+  baby.name = document.getElementById('settingsName').value.trim();
+  baby.dob = document.getElementById('settingsDob').value;
+  await dbPut('baby', baby);
+  closeSettings();
+  refreshDashboard();
+}
+
+async function resetAll() {
+  if (!confirm('Xoá toàn bộ dữ liệu và bắt đầu lại từ đầu?\n\nHành động này không thể hoàn tác!')) return;
+  if (!confirm('Bạn chắc chắn chứ?')) return;
+  await dbClear('baby');
+  await dbClear('feedings');
+  baby = null;
+  document.getElementById('bottomNav').classList.add('hidden');
+  closeSettings();
+  showScreen('welcome');
+}
+
+// ===== URL SHARING (COMPRESSED) =====
+var pendingImportData = null;
+
+function compressAndEncode(data) {
+  if (typeof pako === 'undefined') throw new Error('Thư viện nén chưa tải xong. Vui lòng kiểm tra kết nối mạng.');
+  // Minimize JSON keys to save space
+  var minified = {
+    b: { n: data.baby.name, d: data.baby.dob },
+    f: data.feedings.map(function(f) {
+      var m = { t: f.type, ts: f.timestamp };
+      if (f.amount) m.a = f.amount;
+      if (f.duration) m.du = f.duration;
+      if (f.side) m.s = f.side;
+      if (f.food) m.fo = f.food;
+      if (f.note) m.n = f.note;
+      if (f.estimatedMl) m.e = f.estimatedMl;
+      if (f.unit) m.u = f.unit;
+      return m;
+    })
+  };
+  var jsonStr = JSON.stringify(minified);
+  var compressed = pako.deflate(jsonStr, { level: 9 });
+  // Convert to base64url
+  var binary = '';
+  for (var i = 0; i < compressed.length; i++) {
+    binary += String.fromCharCode(compressed[i]);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function decodeAndDecompress(encoded) {
+  if (typeof pako === 'undefined') throw new Error('Thư viện nén chưa tải xong. Vui lòng kiểm tra kết nối mạng.');
+  // base64url → base64
+  var base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) base64 += '=';
+  var binary = atob(base64);
+  var bytes = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  var decompressed = pako.inflate(bytes, { to: 'string' });
+  var minified = JSON.parse(decompressed);
+  // Expand back to full format
+  return {
+    baby: { id: 1, name: minified.b.n, dob: minified.b.d },
+    feedings: minified.f.map(function(m) {
+      var f = { type: m.t, timestamp: m.ts };
+      if (m.a !== undefined) f.amount = m.a;
+      if (m.du !== undefined) f.duration = m.du;
+      if (m.s) f.side = m.s;
+      if (m.fo) f.food = m.fo;
+      if (m.n) f.note = m.n;
+      if (m.e) f.estimatedMl = m.e;
+      if (m.u) f.unit = m.u;
+      return f;
+    })
+  };
+}
+
+async function shareData() {
+  if (typeof pako === 'undefined') {
+    alert('Chức năng chia sẻ không khả dụng khi offline. Vui lòng kết nối mạng và thử lại.');
+    return;
+  }
+  var feedings = await dbGetAll('feedings');
+  var data = { baby: baby, feedings: feedings };
+  try {
+    var encoded = compressAndEncode(data);
+    var baseUrl = window.location.origin + window.location.pathname;
+    var shareUrl = baseUrl + '#d=' + encoded;
+
+    document.getElementById('shareLinkBox').textContent = shareUrl;
+    document.getElementById('shareResult').style.display = 'block';
+
+    // Show size info
+    var origSize = JSON.stringify(data).length;
+    var compSize = encoded.length;
+    var ratio = Math.round((1 - compSize / origSize) * 100);
+    document.getElementById('shareLinkBox').textContent =
+      shareUrl + '\n\n(' + feedings.length + ' cữ ăn · Nén ' + ratio + '% · ' + Math.round(compSize / 1024) + ' KB)';
+  } catch (err) {
+    alert('Lỗi khi tạo link: ' + err.message);
+  }
+}
+
+function copyShareLink() {
+  var text = document.getElementById('shareLinkBox').textContent;
+  var url = text.split('\n')[0]; // Get just the URL, not the info line
+  navigator.clipboard.writeText(url).then(function() {
+    alert('Đã sao chép link!');
+  }).catch(function() {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Đã sao chép link!');
+  });
+}
+
+function nativeShare() {
+  var text = document.getElementById('shareLinkBox').textContent;
+  var url = text.split('\n')[0];
+  if (navigator.share) {
+    navigator.share({
+      title: 'Dữ liệu cữ ăn - ' + baby.name,
+      text: 'Chia sẻ dữ liệu theo dõi cữ ăn của ' + baby.name,
+      url: url
+    }).catch(function() {});
+  } else {
+    copyShareLink();
+  }
+}
+
+function isStandalonePWA() {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.navigator.standalone === true;
+}
+
+function checkUrlImport() {
+  var hash = window.location.hash;
+  if (!hash || !hash.startsWith('#d=')) return false;
+  if (typeof pako === 'undefined') {
+    console.warn('Pako chưa tải, không thể giải nén dữ liệu từ URL');
+    return false;
+  }
+  var encoded = hash.substring(3);
+  try {
+    var data = decodeAndDecompress(encoded);
+    pendingImportData = data;
+
+    // Build info HTML
+    var dob = new Date(data.baby.dob);
+    var dobStr = dob.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    var infoHtml =
+      '<div class="import-info-row"><span class="import-info-label">Tên bé</span><span class="import-info-value">' + data.baby.name + '</span></div>' +
+      '<div class="import-info-row"><span class="import-info-label">Ngày sinh</span><span class="import-info-value">' + dobStr + '</span></div>' +
+      '<div class="import-info-row"><span class="import-info-label">Số cữ ăn</span><span class="import-info-value">' + data.feedings.length + '</span></div>';
+
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+
+    if (!isStandalonePWA()) {
+      // Opened in Safari/browser — show copy-code screen
+      document.getElementById('safariImportInfo').innerHTML = infoHtml;
+      document.getElementById('safariCodeBox').textContent = encoded;
+      document.getElementById('safariCopyCode').classList.add('active');
+    } else {
+      // In PWA — show normal import confirm
+      document.getElementById('importInfo').innerHTML = infoHtml;
+      document.getElementById('importConfirm').classList.add('active');
     }
+    return true;
+  } catch (err) {
+    console.error('Import error:', err);
+    return false;
+  }
+}
 
-    // --- Click ripple effect ---
-    document.addEventListener('click', (e) => {
-      const ripple = document.createElement('div');
-      const size = 60;
-      ripple.className = 'ripple';
-      ripple.style.cssText = `
-        width: ${size}px;
-        height: ${size}px;
-        top: ${e.clientY - size / 2}px;
-        left: ${e.clientX - size / 2}px;
-      `;
-      document.body.appendChild(ripple);
-      requestAnimationFrame(() => ripple.classList.add('active'));
-      ripple.addEventListener('animationend', () => ripple.remove());
+function copySafariCode() {
+  var code = document.getElementById('safariCodeBox').textContent;
+  navigator.clipboard.writeText(code).then(function() {
+    document.getElementById('safariCopyStatus').style.display = 'block';
+  }).catch(function() {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('safariCopyStatus').style.display = 'block';
+  });
+}
 
-      // Spawn burst particles
-      for (let i = 0; i < 8; i++) {
-        const burst = document.createElement('div');
-        burst.style.cssText = `
-          position: fixed;
-          width: 4px; height: 4px;
-          border-radius: 50%;
-          background: hsl(${Math.random() * 60 + 250}, 90%, 70%);
-          left: ${e.clientX}px;
-          top: ${e.clientY}px;
-          pointer-events: none;
-          z-index: 999;
-          transition: transform 0.8s ease-out, opacity 0.8s ease-out;
-        `;
-        document.body.appendChild(burst);
-        const angle = (i / 8) * Math.PI * 2;
-        const dist  = 60 + Math.random() * 60;
-        requestAnimationFrame(() => {
-          burst.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(0)`;
-          burst.style.opacity = '0';
-        });
-        setTimeout(() => burst.remove(), 800);
+async function confirmUrlImport() {
+  if (!pendingImportData) return;
+  await dbClear('baby');
+  await dbClear('feedings');
+  await dbPut('baby', pendingImportData.baby);
+  for (var i = 0; i < pendingImportData.feedings.length; i++) {
+    await dbPut('feedings', pendingImportData.feedings[i]);
+  }
+  baby = pendingImportData.baby;
+  pendingImportData = null;
+  // Clean URL hash
+  history.replaceState(null, '', window.location.pathname);
+  document.getElementById('bottomNav').classList.remove('hidden');
+  showScreen('dashboard');
+}
+
+function cancelUrlImport() {
+  pendingImportData = null;
+  history.replaceState(null, '', window.location.pathname);
+  // Go to normal flow
+  if (baby) {
+    document.getElementById('bottomNav').classList.remove('hidden');
+    showScreen('dashboard');
+  } else {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById('welcome').classList.add('active');
+  }
+}
+
+function showImportCode() {
+  var section = document.getElementById('importCodeSection');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+  if (section.style.display === 'block') {
+    document.getElementById('importCodeInput').value = '';
+    document.getElementById('importCodeInput').focus();
+  }
+}
+
+async function importFromCode() {
+  if (typeof pako === 'undefined') {
+    alert('Chức năng nhập dữ liệu không khả dụng khi offline.');
+    return;
+  }
+  var code = document.getElementById('importCodeInput').value.trim();
+  if (!code) { alert('Vui lòng dán mã dữ liệu'); return; }
+
+  // Strip URL prefix if user pasted full URL
+  var hashIdx = code.indexOf('#d=');
+  if (hashIdx >= 0) {
+    code = code.substring(hashIdx + 3);
+  }
+
+  try {
+    var data = decodeAndDecompress(code);
+    var dob = new Date(data.baby.dob);
+    var dobStr = dob.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    if (!confirm('Nhập dữ liệu của ' + data.baby.name + ' (sinh ' + dobStr + ', ' + data.feedings.length + ' cữ ăn)?\n\nDữ liệu hiện tại sẽ bị thay thế!')) return;
+
+    await dbClear('baby');
+    await dbClear('feedings');
+    await dbPut('baby', data.baby);
+    for (var i = 0; i < data.feedings.length; i++) {
+      await dbPut('feedings', data.feedings[i]);
+    }
+    baby = data.baby;
+    document.getElementById('importCodeSection').style.display = 'none';
+    closeSettings();
+    document.getElementById('bottomNav').classList.remove('hidden');
+    showScreen('dashboard');
+    alert('Nhập dữ liệu thành công!');
+  } catch (err) {
+    alert('Mã dữ liệu không hợp lệ: ' + err.message);
+  }
+}
+
+// ===== DASHBOARD =====
+async function refreshDashboard() {
+  if (!baby) return;
+
+  document.getElementById('dashName').textContent = baby.name;
+  document.getElementById('dashAge').textContent = getAgeText();
+
+  const std = getStandard();
+  document.getElementById('standardBar').innerHTML =
+    'Chuẩn y khoa (' + std.label + '): <strong>' + std.mlMin + '-' + std.mlMax + ' ml/cữ</strong>, ' + std.feedsMin + '-' + std.feedsMax + ' cữ/ngày';
+
+  const allFeedings = await dbGetAll('feedings');
+
+  // Recalculate nursing estimate ratio for display
+  calculateNursingMlPerMinute(allFeedings);
+
+  const today = startOfDay(new Date());
+  const todayEnd = endOfDay(new Date());
+  const todayFeedings = allFeedings
+    .filter(function(f) { var t = new Date(f.timestamp); return t >= today && t <= todayEnd; })
+    .sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp) || (b.id || 0) - (a.id || 0); });
+
+  var totalMl = 0, totalNursing = 0, totalEstMl = 0;
+  todayFeedings.forEach(function(f) {
+    if (f.type === 'formula' || f.type === 'breast_milk') totalMl += (f.amount || 0);
+    if (f.type === 'nursing') {
+      totalNursing += (f.duration || 0);
+      totalEstMl += (f.estimatedMl || estimateNursingMl(f.duration || 0));
+    }
+  });
+
+  document.getElementById('totalMl').textContent = totalMl;
+  document.getElementById('totalFeeds').textContent = todayFeedings.length;
+  document.getElementById('totalNursing').textContent = totalNursing;
+  document.getElementById('nursingEstMl').textContent = totalEstMl > 0 ? '≈' + totalEstMl + ' ml' : '';
+
+  updatePrediction(allFeedings);
+
+  var listEl = document.getElementById('feedingList');
+  if (todayFeedings.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">Chưa có cữ ăn nào hôm nay</div>';
+  } else {
+    listEl.innerHTML = todayFeedings.map(renderFeedingItem).join('');
+  }
+}
+
+function renderFeedingItem(f) {
+  var detail = '';
+  if (f.type === 'formula' || f.type === 'breast_milk') {
+    detail = f.amount + ' ml';
+  } else if (f.type === 'nursing') {
+    var sideText = { left: 'Trái', right: 'Phải', both: 'Cả hai' }[f.side] || '';
+    detail = sideText + ' · ' + f.duration + ' phút';
+    if (f.estimatedMl) detail += ' · ≈' + f.estimatedMl + ' ml';
+  } else if (f.type === 'solid') {
+    detail = f.food || 'Ăn dặm';
+    if (f.amount) detail += ' · ' + f.amount + ' ml';
+  }
+  if (f.note) detail += ' · ' + f.note;
+
+  return '<div class="feeding-item">' +
+    '<div class="feeding-icon ' + f.type + '">' + typeIcon(f.type) + '</div>' +
+    '<div class="feeding-info">' +
+      '<div class="feeding-type">' + typeLabel(f.type) + '</div>' +
+      '<div class="feeding-detail">' + detail + '</div>' +
+    '</div>' +
+    '<div class="feeding-time">' + formatTime(f.timestamp) + '</div>' +
+    '<button class="feeding-delete" onclick="deleteFeeding(' + f.id + ')" title="Xoá">&times;</button>' +
+  '</div>';
+}
+
+async function deleteFeeding(id) {
+  if (!confirm('Xoá cữ ăn này?')) return;
+  await dbDelete('feedings', id);
+  if (document.getElementById('dashboard').classList.contains('active')) refreshDashboard();
+  if (document.getElementById('history').classList.contains('active')) refreshHistory();
+}
+
+// ===== PREDICTION =====
+function updatePrediction(allFeedings) {
+  var std = getStandard();
+  var sorted = allFeedings.slice().sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+  var card = document.getElementById('predictionCard');
+
+  if (sorted.length === 0) {
+    card.classList.remove('overdue');
+    document.getElementById('predictionTime').textContent = 'Chưa có dữ liệu';
+    document.getElementById('predictionCountdown').textContent = '';
+    document.getElementById('predictionDetail').textContent =
+      'Chuẩn: mỗi ' + std.intervalMin + '-' + std.intervalMax + ' giờ, ' + std.mlMin + '-' + std.mlMax + ' ml/cữ';
+    document.getElementById('predictionLast').innerHTML = '';
+    return;
+  }
+
+  // Minimum interval threshold: use medical standard minimum (in ms)
+  var minIntervalMs = std.intervalMin * 3600000 * 0.5;
+
+  var sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  var recentFeedings = sorted.filter(function(f) { return new Date(f.timestamp) >= sevenDaysAgo; });
+
+  var avgIntervalMs;
+  if (recentFeedings.length >= 3) {
+    var totalInterval = 0, count = 0;
+    for (var i = 0; i < recentFeedings.length - 1; i++) {
+      var diff = new Date(recentFeedings[i].timestamp) - new Date(recentFeedings[i + 1].timestamp);
+      if (diff >= minIntervalMs && diff < 12 * 3600000) {
+        totalInterval += diff;
+        count++;
+      }
+    }
+    avgIntervalMs = count > 0 ? totalInterval / count : ((std.intervalMin + std.intervalMax) / 2) * 3600000;
+  } else {
+    avgIntervalMs = ((std.intervalMin + std.intervalMax) / 2) * 3600000;
+  }
+
+  // Clamp interval to medical standard range
+  var stdMinMs = std.intervalMin * 3600000;
+  var stdMaxMs = std.intervalMax * 3600000;
+  if (avgIntervalMs < stdMinMs) avgIntervalMs = stdMinMs;
+  if (avgIntervalMs > stdMaxMs) avgIntervalMs = stdMaxMs;
+
+  var lastFeeding = sorted[0];
+  var nextTime = new Date(new Date(lastFeeding.timestamp).getTime() + avgIntervalMs);
+
+  // === Calculate today's total ml (bottle + estimated nursing) ===
+  var today = startOfDay(new Date());
+  var todayEnd = endOfDay(new Date());
+  var todayFeedings = sorted.filter(function(f) {
+    var t = new Date(f.timestamp);
+    return t >= today && t <= todayEnd;
+  });
+  var todayTotalMl = 0;
+  todayFeedings.forEach(function(f) {
+    if (f.type === 'formula' || f.type === 'breast_milk') todayTotalMl += (f.amount || 0);
+    if (f.type === 'nursing') todayTotalMl += (f.estimatedMl || estimateNursingMl(f.duration || 0));
+  });
+
+  // Daily target based on medical standard: avgMl * avgFeeds
+  var avgFeedsPerDay = (std.feedsMin + std.feedsMax) / 2;
+  var avgMlPerFeed = Math.round((std.mlMin + std.mlMax) / 2);
+  var dailyTargetMl = Math.round(avgMlPerFeed * avgFeedsPerDay);
+
+  // Remaining feeds today estimate
+  var remainingMl = Math.max(0, dailyTargetMl - todayTotalMl);
+  var remainingFeeds = Math.max(0, Math.round(avgFeedsPerDay) - todayFeedings.length);
+
+  // Calculate recommended amount per feed
+  var recommendedMl;
+  if (remainingMl <= 0 || remainingFeeds <= 0) {
+    // Already exceeded daily target
+    recommendedMl = 0;
+  } else {
+    recommendedMl = Math.round(remainingMl / remainingFeeds / 10) * 10;
+    // Clamp to medical standard range
+    recommendedMl = Math.max(std.mlMin, Math.min(std.mlMax, recommendedMl));
+  }
+
+  // Calculate recommended nursing duration
+  var nursingFeedings = recentFeedings.filter(function(f) { return f.type === 'nursing' && f.duration > 0; });
+  var recommendedNursingMin = 0;
+  if (nursingMlPerMinute > 0 && recommendedMl > 0) {
+    recommendedNursingMin = Math.round(recommendedMl / nursingMlPerMinute);
+  } else if (nursingFeedings.length > 0) {
+    recommendedNursingMin = Math.round(nursingFeedings.reduce(function(s, f) { return s + f.duration; }, 0) / nursingFeedings.length);
+  }
+
+  // Build recommendation text
+  var recommendText = '';
+  var dailyNote = '';
+  if (recommendedMl <= 0) {
+    recommendText = 'Đã đủ lượng sữa hôm nay!';
+    dailyNote = todayTotalMl + '/' + dailyTargetMl + ' ml hôm nay';
+  } else {
+    recommendText = recommendedMl + ' ml';
+    if (nursingFeedings.length > 0 && recommendedNursingMin > 0) {
+      recommendText += ' hoặc ~' + recommendedNursingMin + ' phút bú mẹ';
+    }
+    dailyNote = todayTotalMl + '/' + dailyTargetMl + ' ml hôm nay';
+  }
+
+  var now = new Date();
+  var diffMin = Math.round((nextTime - now) / 60000);
+
+  if (recommendedMl <= 0) {
+    // Already met daily target
+    card.classList.remove('overdue');
+    document.getElementById('predictionTime').textContent = 'Đã đủ cữ!';
+    document.getElementById('predictionCountdown').textContent = dailyNote;
+  } else if (diffMin <= 0) {
+    card.classList.add('overdue');
+    var overMin = Math.abs(diffMin);
+    document.getElementById('predictionTime').textContent = 'Đã đến giờ ăn!';
+    if (overMin > 0) {
+      document.getElementById('predictionCountdown').textContent = 'Trễ ' + overMin + ' phút · Nên cho bú ' + recommendText;
+    } else {
+      document.getElementById('predictionCountdown').textContent = 'Ngay bây giờ · Nên cho bú ' + recommendText;
+    }
+  } else {
+    card.classList.remove('overdue');
+    document.getElementById('predictionTime').textContent = formatTime(nextTime);
+    if (diffMin < 60) {
+      document.getElementById('predictionCountdown').textContent = 'Còn ' + diffMin + ' phút nữa';
+    } else {
+      var h = Math.floor(diffMin / 60);
+      var m = diffMin % 60;
+      document.getElementById('predictionCountdown').textContent = 'Còn ' + h + ' giờ ' + m + ' phút';
+    }
+  }
+
+  var intervalHours = Math.round(avgIntervalMs / 3600000 * 10) / 10;
+  if (recommendedMl > 0) {
+    document.getElementById('predictionDetail').textContent =
+      'Gợi ý: ' + recommendText + ' · Mỗi ' + intervalHours + ' giờ · ' + dailyNote;
+  } else {
+    document.getElementById('predictionDetail').textContent =
+      'Chuẩn: ' + std.mlMin + '-' + std.mlMax + ' ml/cữ · ' + std.feedsMin + '-' + std.feedsMax + ' cữ/ngày';
+  }
+
+  // Last feeding info
+  var lastDetail = typeIcon(lastFeeding.type) + ' ' + typeLabel(lastFeeding.type) + ' lúc ' + formatTime(lastFeeding.timestamp);
+  document.getElementById('predictionLast').innerHTML = lastDetail;
+}
+
+// ===== ADD FEEDING MODAL =====
+async function openAddModal(preSelectType) {
+  var allFeedings = await dbGetAll('feedings');
+  var sorted = allFeedings.slice().sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+
+  // Calculate nursing-to-ml ratio
+  calculateNursingMlPerMinute(allFeedings);
+
+  // Default to formula unless explicitly told otherwise (e.g. from toggleNursing)
+  var defaultType = preSelectType || 'formula';
+  selectType(defaultType);
+
+  var std = getStandard();
+  var recentMilk = sorted
+    .filter(function(f) { return f.type === 'formula' || f.type === 'breast_milk'; })
+    .slice(0, 10);
+  var suggestedMl = recentMilk.length >= 3
+    ? Math.round(recentMilk.reduce(function(s, f) { return s + (f.amount || 0); }, 0) / recentMilk.length / 10) * 10
+    : Math.round((std.mlMin + std.mlMax) / 2 / 10) * 10;
+
+  currentAmount = suggestedMl;
+  document.getElementById('amountValue').textContent = currentAmount;
+  document.getElementById('amountHint').textContent = 'Chuẩn y khoa: ' + std.mlMin + '-' + std.mlMax + ' ml';
+
+  var quickEl = document.getElementById('quickAmounts');
+  var quickValues = [std.mlMin, Math.round((std.mlMin + std.mlMax) / 2 / 10) * 10, std.mlMax];
+  quickEl.innerHTML = quickValues.map(function(v) {
+    return '<button class="quick-btn" onclick="setAmount(' + v + ')">' + v + ' ml</button>';
+  }).join('');
+
+  document.getElementById('feedingTime').value = toLocalDatetimeString(new Date());
+  document.getElementById('feedingNote').value = '';
+  document.getElementById('foodName').value = '';
+  document.getElementById('backfillHint').style.display = 'none';
+  document.getElementById('nursingTimer').classList.add('hidden');
+  if (window._modalTimerInterval) { clearInterval(window._modalTimerInterval); window._modalTimerInterval = null; }
+  currentDuration = 10;
+  document.getElementById('durationValue').textContent = currentDuration;
+  currentSolidAmount = 0;
+  document.getElementById('solidAmount').textContent = currentSolidAmount;
+  selectSide('left');
+  updateNursingEstimate();
+
+  document.getElementById('addModal').classList.add('active');
+}
+
+// Show backfill hint when time is changed
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'feedingTime') {
+    var selected = new Date(e.target.value);
+    var now = new Date();
+    var diffMs = Math.abs(now - selected);
+    var hint = document.getElementById('backfillHint');
+    if (diffMs > 5 * 60000) { // > 5 min difference
+      hint.style.display = 'block';
+    } else {
+      hint.style.display = 'none';
+    }
+  }
+});
+
+// ===== NURSING TIMER =====
+function toggleNursing() {
+  if (nursingStartTime) {
+    // Already recording → open modal to review and save
+    openNursingModal();
+  } else {
+    // Start recording AND open modal immediately
+    startNursingTimer();
+    openNursingModal();
+  }
+}
+
+async function startNursingTimer() {
+  nursingStartTime = new Date();
+
+  // Prepare modal data
+  var allFeedings = await dbGetAll('feedings');
+  calculateNursingMlPerMinute(allFeedings);
+
+  // Update nav button
+  document.getElementById('navNurse').classList.add('recording');
+  document.getElementById('navNurseLabel').textContent = '00:00';
+
+  // Start interval to update nav label
+  nursingTimerInterval = setInterval(function() {
+    var elapsed = Math.floor((new Date() - nursingStartTime) / 1000);
+    var min = Math.floor(elapsed / 60);
+    var sec = elapsed % 60;
+    var timeStr = (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+    document.getElementById('navNurseLabel').textContent = timeStr;
+  }, 1000);
+}
+
+async function openNursingModal() {
+  var allFeedings = await dbGetAll('feedings');
+  calculateNursingMlPerMinute(allFeedings);
+
+  // Open modal with nursing selected — simplified UI
+  var sorted = allFeedings.slice().sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+  var std = getStandard();
+  var recentMilk = sorted
+    .filter(function(f) { return f.type === 'formula' || f.type === 'breast_milk'; })
+    .slice(0, 10);
+  var suggestedMl = recentMilk.length >= 3
+    ? Math.round(recentMilk.reduce(function(s, f) { return s + (f.amount || 0); }, 0) / recentMilk.length / 10) * 10
+    : Math.round((std.mlMin + std.mlMax) / 2 / 10) * 10;
+  currentAmount = suggestedMl;
+  document.getElementById('amountValue').textContent = currentAmount;
+  document.getElementById('amountHint').textContent = 'Chuẩn y khoa: ' + std.mlMin + '-' + std.mlMax + ' ml';
+
+  selectType('nursing');
+
+  // Hide type selector and duration controls — only show timer, side, estimate
+  document.getElementById('typeSelector').classList.add('hidden');
+  document.querySelector('.duration-controls').classList.add('hidden');
+  document.querySelector('#addModal h2').textContent = 'Đang bú mẹ';
+
+  // Set time to when nursing started
+  document.getElementById('feedingTime').value = toLocalDatetimeString(nursingStartTime);
+  document.getElementById('feedingNote').value = '';
+  document.getElementById('backfillHint').style.display = 'none';
+
+  // Calculate duration
+  var elapsedMs = new Date() - nursingStartTime;
+  currentDuration = Math.max(1, Math.round(elapsedMs / 60000));
+  document.getElementById('durationValue').textContent = currentDuration;
+
+  // Show timer
+  document.getElementById('nursingTimer').classList.remove('hidden');
+  updateNursingTimerDisplay();
+
+  // Start modal timer update
+  if (window._modalTimerInterval) clearInterval(window._modalTimerInterval);
+  window._modalTimerInterval = setInterval(function() {
+    var elapsed = Math.floor((new Date() - nursingStartTime) / 1000);
+    var min = Math.floor(elapsed / 60);
+    var sec = elapsed % 60;
+    document.getElementById('nursingTimerValue').textContent =
+      (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+    currentDuration = Math.max(1, Math.ceil(elapsed / 60));
+    document.getElementById('durationValue').textContent = currentDuration;
+    updateNursingEstimate();
+  }, 1000);
+
+  currentSolidAmount = 0;
+  document.getElementById('solidAmount').textContent = currentSolidAmount;
+  selectSide('left');
+  updateNursingEstimate();
+
+  document.getElementById('addModal').classList.add('active');
+}
+
+function updateNursingTimerDisplay() {
+  if (!nursingStartTime) return;
+  var elapsed = Math.floor((new Date() - nursingStartTime) / 1000);
+  var min = Math.floor(elapsed / 60);
+  var sec = elapsed % 60;
+  document.getElementById('nursingTimerValue').textContent =
+    (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function stopNursingTimer() {
+  if (nursingTimerInterval) {
+    clearInterval(nursingTimerInterval);
+    nursingTimerInterval = null;
+  }
+  if (window._modalTimerInterval) {
+    clearInterval(window._modalTimerInterval);
+    window._modalTimerInterval = null;
+  }
+  nursingStartTime = null;
+  document.getElementById('navNurse').classList.remove('recording');
+  document.getElementById('navNurseLabel').textContent = 'Bắt đầu bú';
+  document.getElementById('nursingTimer').classList.add('hidden');
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('active');
+  if (window._modalTimerInterval) {
+    clearInterval(window._modalTimerInterval);
+    window._modalTimerInterval = null;
+  }
+  // Auto-stop nursing timer when closing modal
+  if (nursingStartTime) {
+    stopNursingTimer();
+  }
+  // Reset modal to normal state (undo nursing-only simplification)
+  document.getElementById('typeSelector').classList.remove('hidden');
+  document.querySelector('.duration-controls').classList.remove('hidden');
+  document.querySelector('#addModal h2').textContent = 'Thêm cữ ăn';
+}
+
+function selectType(type) {
+  currentType = type;
+  document.querySelectorAll('.type-btn').forEach(function(b) {
+    b.classList.toggle('selected', b.dataset.type === type);
+  });
+  var isMilk = type === 'formula' || type === 'breast_milk';
+  document.getElementById('amountSection').classList.toggle('hidden', !isMilk);
+  document.getElementById('nursingSection').classList.toggle('hidden', type !== 'nursing');
+  document.getElementById('solidSection').classList.toggle('hidden', type !== 'solid');
+}
+
+function adjustAmount(delta) {
+  currentAmount = Math.max(0, currentAmount + delta);
+  document.getElementById('amountValue').textContent = currentAmount;
+}
+
+function setAmount(val) {
+  currentAmount = val;
+  document.getElementById('amountValue').textContent = currentAmount;
+}
+
+function selectSide(side) {
+  currentSide = side;
+  document.querySelectorAll('.side-btn').forEach(function(b) {
+    b.classList.toggle('selected', b.dataset.side === side);
+  });
+}
+
+function adjustDuration(delta) {
+  if (delta > 0) {
+    // Round up to next multiple of 5
+    currentDuration = Math.ceil((currentDuration + 1) / 5) * 5;
+  } else {
+    // Round down to previous multiple of 5, minimum 1
+    var target = Math.floor((currentDuration - 1) / 5) * 5;
+    currentDuration = Math.max(1, target);
+  }
+  document.getElementById('durationValue').textContent = currentDuration;
+  updateNursingEstimate();
+}
+
+function adjustSolidAmount(delta) {
+  currentSolidAmount = Math.max(0, currentSolidAmount + delta);
+  document.getElementById('solidAmount').textContent = currentSolidAmount;
+}
+
+async function saveFeeding() {
+  var timeStr = document.getElementById('feedingTime').value;
+  if (!timeStr) { alert('Vui lòng chọn thời gian'); return; }
+
+  // Check if user manually changed the time (backfill)
+  var pickedTime = new Date(timeStr);
+  var now = new Date();
+  var diffMs = Math.abs(now - pickedTime);
+  // If time is within 5 minutes of now, use precise current time to avoid duplicate timestamps
+  var feedingTimestamp = diffMs < 5 * 60000 ? now.toISOString() : pickedTime.toISOString();
+
+  var feeding = {
+    type: currentType,
+    timestamp: feedingTimestamp,
+    note: document.getElementById('feedingNote').value.trim(),
+  };
+
+  if (currentType === 'formula' || currentType === 'breast_milk') {
+    if (currentAmount <= 0) { alert('Vui lòng nhập lượng sữa'); return; }
+    feeding.amount = currentAmount;
+    feeding.unit = 'ml';
+  } else if (currentType === 'nursing') {
+    feeding.side = currentSide;
+    feeding.duration = currentDuration;
+    feeding.estimatedMl = estimateNursingMl(currentDuration);
+  } else if (currentType === 'solid') {
+    feeding.food = document.getElementById('foodName').value.trim();
+    feeding.amount = currentSolidAmount;
+  }
+
+  await dbPut('feedings', feeding);
+  if (nursingStartTime && currentType === 'nursing') {
+    stopNursingTimer();
+  }
+  closeAddModal();
+  refreshDashboard();
+}
+
+// ===== HISTORY =====
+function changeHistoryDate(delta) {
+  historyDate.setDate(historyDate.getDate() + delta);
+  if (historyDate > new Date()) historyDate = new Date();
+  refreshHistory();
+}
+
+async function refreshHistory() {
+  document.getElementById('historyDateLabel').textContent = formatDate(historyDate);
+
+  var allFeedings = await dbGetAll('feedings');
+  var dayStart = startOfDay(historyDate);
+  var dayEnd = endOfDay(historyDate);
+  var dayFeedings = allFeedings
+    .filter(function(f) { var t = new Date(f.timestamp); return t >= dayStart && t <= dayEnd; })
+    .sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp) || (b.id || 0) - (a.id || 0); });  var totalMl = 0, totalNursing = 0;
+  dayFeedings.forEach(function(f) {
+    if (f.type === 'formula' || f.type === 'breast_milk') totalMl += (f.amount || 0);
+    if (f.type === 'nursing') totalNursing += (f.duration || 0);
+  });
+
+  document.getElementById('historySummary').innerHTML =
+    '<div class="summary-card">' +
+      '<div class="summary-value" style="color:var(--primary)">' + totalMl + '</div>' +
+      '<div class="summary-label">ml sữa</div>' +
+    '</div>' +
+    '<div class="summary-card">' +
+      '<div class="summary-value" style="color:var(--accent)">' + dayFeedings.length + '</div>' +
+      '<div class="summary-label">cữ ăn</div>' +
+    '</div>' +
+    '<div class="summary-card">' +
+      '<div class="summary-value" style="color:var(--warning)">' + totalNursing + '</div>' +
+      '<div class="summary-label">phút bú</div>' +
+    '</div>';
+
+  var listEl = document.getElementById('historyList');
+  if (dayFeedings.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">Không có cữ ăn nào</div>';
+  } else {
+    listEl.innerHTML = dayFeedings.map(renderFeedingItem).join('');
+  }
+
+  // Render chart
+  renderChart(allFeedings, chartRange);
+}
+
+function setChartRange(range) {
+  chartRange = range;
+  document.querySelectorAll('.chart-range-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.range === range);
+  });
+  refreshHistory();
+}
+
+function renderChart(allFeedings, range) {
+  var canvas = document.getElementById('historyChart');
+  if (!canvas) return;
+  var container = document.getElementById('chartContainer');
+  var dpr = window.devicePixelRatio || 1;
+  var cw = container.clientWidth - 32; // padding
+  var ch = 160;
+  canvas.width = cw * dpr;
+  canvas.height = ch * dpr;
+  canvas.style.width = cw + 'px';
+  canvas.style.height = ch + 'px';
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var numDays = range === 'month' ? 30 : 7;
+
+  // Build daily totals
+  var days = [];
+  var endDate = new Date(historyDate);
+  for (var i = numDays - 1; i >= 0; i--) {
+    var d = new Date(endDate);
+    d.setDate(d.getDate() - i);
+    var ds = startOfDay(d);
+    var de = endOfDay(d);
+    var totalMl = 0;
+    allFeedings.forEach(function(f) {
+      var t = new Date(f.timestamp);
+      if (t >= ds && t <= de) {
+        if (f.type === 'formula' || f.type === 'breast_milk') totalMl += (f.amount || 0);
+        if (f.type === 'nursing') totalMl += (f.estimatedMl || estimateNursingMl(f.duration || 0));
       }
     });
+    days.push({
+      date: d,
+      label: (d.getDate()) + '/' + (d.getMonth() + 1),
+      ml: totalMl,
+      isSelected: startOfDay(d).getTime() === startOfDay(historyDate).getTime()
+    });
+  }
 
-    // --- Typing easter egg on hover ---
-    const helloEl = document.getElementById('hello');
-    const messages = ['Hello,', 'Xin chào,', 'こんにちは,', 'Bonjour,', 'Hola,', '안녕하세요,'];
-    let msgIndex = 0;
-    let typing = false;
+  // Target ml/day from medical standard
+  var std = getStandard();
+  var targetMl = Math.round(((std.mlMin + std.mlMax) / 2) * ((std.feedsMin + std.feedsMax) / 2));
+  var maxMl = Math.max(targetMl, Math.max.apply(null, days.map(function(d) { return d.ml; })));
+  if (maxMl === 0) maxMl = targetMl || 500;
 
-    helloEl.addEventListener('mouseenter', () => {
-      if (typing) return;
-      typing = true;
-      msgIndex = (msgIndex + 1) % messages.length;
-      const target = messages[msgIndex];
-      let i = 0;
-      helloEl.textContent = '';
-      const iv = setInterval(() => {
-        helloEl.textContent = target.slice(0, ++i);
-        if (i >= target.length) { clearInterval(iv); typing = false; }
-      }, 60);
+  // Layout
+  var padLeft = 36;
+  var padRight = 8;
+  var padTop = 20;
+  var padBottom = 28;
+  var chartW = cw - padLeft - padRight;
+  var chartH = ch - padTop - padBottom;
+  var barGap = range === 'month' ? 2 : 4;
+  var barW = (chartW - barGap * (numDays - 1)) / numDays;
+
+  // Clear
+  ctx.clearRect(0, 0, cw, ch);
+
+  // Y-axis gridlines
+  ctx.strokeStyle = '#E0E6ED';
+  ctx.lineWidth = 0.5;
+  ctx.font = '10px -apple-system, sans-serif';
+  ctx.fillStyle = '#636E72';
+  ctx.textAlign = 'right';
+  var ySteps = 4;
+  for (var s = 0; s <= ySteps; s++) {
+    var yVal = Math.round(maxMl * s / ySteps);
+    var y = padTop + chartH - (chartH * s / ySteps);
+    ctx.beginPath();
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(cw - padRight, y);
+    ctx.stroke();
+    if (s > 0) {
+      ctx.fillText(yVal, padLeft - 4, y + 3);
+    }
+  }
+
+  // Target line (dashed)
+  var targetY = padTop + chartH - (chartH * targetMl / maxMl);
+  ctx.save();
+  ctx.strokeStyle = '#FF8FA3';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(padLeft, targetY);
+  ctx.lineTo(cw - padRight, targetY);
+  ctx.stroke();
+  ctx.restore();
+  // Target label
+  ctx.fillStyle = '#FF8FA3';
+  ctx.textAlign = 'left';
+  ctx.font = '9px -apple-system, sans-serif';
+  ctx.fillText('Chuẩn', padLeft + 2, targetY - 4);
+
+  // Bars
+  ctx.textAlign = 'center';
+  for (var b = 0; b < days.length; b++) {
+    var x = padLeft + b * (barW + barGap);
+    var barH = days[b].ml > 0 ? Math.max(2, chartH * days[b].ml / maxMl) : 0;
+    var barY = padTop + chartH - barH;
+
+    // Bar color
+    if (days[b].isSelected) {
+      ctx.fillStyle = '#5B9BD5';
+    } else {
+      ctx.fillStyle = '#B3D4F0';
+    }
+
+    // Draw bar with rounded top
+    var r = Math.min(3, barW / 2);
+    if (barH > 0) {
+      ctx.beginPath();
+      ctx.moveTo(x, padTop + chartH);
+      ctx.lineTo(x, barY + r);
+      ctx.quadraticCurveTo(x, barY, x + r, barY);
+      ctx.lineTo(x + barW - r, barY);
+      ctx.quadraticCurveTo(x + barW, barY, x + barW, barY + r);
+      ctx.lineTo(x + barW, padTop + chartH);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Value on top
+    if (days[b].ml > 0 && (range === 'week' || days[b].isSelected)) {
+      ctx.fillStyle = days[b].isSelected ? '#2D3436' : '#636E72';
+      ctx.font = (range === 'month' ? '8' : '10') + 'px -apple-system, sans-serif';
+      ctx.fillText(days[b].ml, x + barW / 2, barY - 4);
+    }
+
+    // X label
+    ctx.fillStyle = days[b].isSelected ? '#5B9BD5' : '#636E72';
+    ctx.font = (range === 'month' ? '8' : '10') + 'px -apple-system, sans-serif';
+    if (range === 'month') {
+      // Show every 5th label for month view
+      if (b % 5 === 0 || days[b].isSelected) {
+        ctx.fillText(days[b].label, x + barW / 2, ch - 4);
+      }
+    } else {
+      ctx.fillText(days[b].label, x + barW / 2, ch - 4);
+    }
+  }
+}
+
+// ===== MODAL OVERLAY CLICK =====
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+      // Auto-stop nursing timer if closing add modal
+      if (overlay.id === 'addModal') {
+        if (window._modalTimerInterval) {
+          clearInterval(window._modalTimerInterval);
+          window._modalTimerInterval = null;
+        }
+        if (nursingStartTime) {
+          stopNursingTimer();
+        }
+        // Reset modal to normal state
+        document.getElementById('typeSelector').classList.remove('hidden');
+        document.querySelector('.duration-controls').classList.remove('hidden');
+        document.querySelector('#addModal h2').textContent = 'Thêm cữ ăn';
+      }
+    }
+  });
+});
+
+// ===== INIT =====
+(async function init() {
+  db = await openDB();
+
+  // Check for URL import first
+  var hasImport = checkUrlImport();
+  if (!hasImport) {
+    await loadBaby();
+  } else {
+    // Still load baby data in background for cancelUrlImport
+    var babies = await dbGetAll('baby');
+    if (babies.length > 0) baby = babies[0];
+  }
+
+  setInterval(function() {
+    if (baby && document.getElementById('dashboard').classList.contains('active')) {
+      refreshDashboard();
+    }
+  }, 60000);
+
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      // Check for updates every 60 seconds
+      setInterval(function() { reg.update(); }, 60000);
+
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New version available
+            showUpdateToast(newWorker);
+          }
+        });
+      });
+    }).catch(function(err) {
+      console.log('SW registration failed:', err);
     });
 
-    // --- Subtle parallax on mouse move ---
-    document.addEventListener('mousemove', (e) => {
-      const cx = window.innerWidth  / 2;
-      const cy = window.innerHeight / 2;
-      const dx = (e.clientX - cx) / cx;
-      const dy = (e.clientY - cy) / cy;
-      document.querySelector('.card').style.transform =
-        `perspective(800px) rotateY(${dx * 6}deg) rotateX(${-dy * 6}deg)`;
+    // Handle controller change (after skipWaiting)
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
+      window.location.reload();
     });
+  }
+})();
 
-    document.addEventListener('mouseleave', () => {
-      document.querySelector('.card').style.transform = '';
-    });
-  </script>
+function showUpdateToast(worker) {
+  var toast = document.createElement('div');
+  toast.className = 'update-toast';
+  toast.innerHTML = '<span>Có bản cập nhật mới!</span><button onclick="applyUpdate()">Cập nhật</button>';
+  document.body.appendChild(toast);
+  window._pendingWorker = worker;
+}
+
+function applyUpdate() {
+  if (window._pendingWorker) {
+    window._pendingWorker.postMessage({ type: 'SKIP_WAITING' });
+  }
+}
+</script>
 </body>
 </html>

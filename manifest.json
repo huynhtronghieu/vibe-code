@@ -1,0 +1,19 @@
+{
+  "name": "Theo dõi cữ ăn bé",
+  "short_name": "Cữ ăn bé",
+  "description": "Theo dõi cữ ăn hàng ngày của bé - sữa, bú mẹ, ăn dặm",
+  "start_url": "/fetch-baby/",
+  "scope": "/fetch-baby/",
+  "display": "standalone",
+  "background_color": "#F5F7FA",
+  "theme_color": "#5B9BD5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%235B9BD5'/><text x='256' y='380' font-size='320' text-anchor='middle'>🍼</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

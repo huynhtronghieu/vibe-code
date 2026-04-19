@@ -2016,8 +2016,10 @@ function updatePrediction(allFeedings) {
     return;
   }
 
-  // Minimum interval threshold: use medical standard minimum (in ms)
+  // Minimum interval for avg calculation: filter out same-session feeds
   var minIntervalMs = std.intervalMin * 3600000 * 0.5;
+  // Session grouping: wider window (75% of standard min) to catch snack feedings
+  var sessionGroupMs = std.intervalMin * 3600000 * 0.75;
 
   var sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -2046,39 +2048,37 @@ function updatePrediction(allFeedings) {
 
   var lastFeeding = sorted[0];
 
-  // Group recent feedings into a "session" — consecutive feeds within minIntervalMs
-  // are treated as one feeding session (e.g. 30ml at 20:57 + 15ml at 21:15 = 45ml session)
+  // Group recent feedings into a "session" — consecutive feeds within sessionGroupMs
+  // Snack feedings before predicted next meal get grouped with the previous feeding
   var sessionMl = 0;
-  var sessionStart = new Date(lastFeeding.timestamp);
+  var sessionFirstTime = new Date(lastFeeding.timestamp);
   for (var si = 0; si < sorted.length; si++) {
     var f = sorted[si];
     var fTime = new Date(f.timestamp);
-    // If this feeding is within minIntervalMs of the next one (closer to now), group it
-    if (si === 0 || (new Date(sorted[si - 1].timestamp) - fTime) < minIntervalMs) {
+    if (si === 0 || (new Date(sorted[si - 1].timestamp) - fTime) < sessionGroupMs) {
       if (f.type === 'formula' || f.type === 'breast_milk') {
         sessionMl += (f.amount || 0);
       } else if (f.type === 'nursing') {
         sessionMl += (f.estimatedMl || estimateNursingMl(f.duration || 0));
       }
-      sessionStart = fTime; // earliest feeding in session
+      sessionFirstTime = fTime;
     } else {
       break;
     }
   }
 
   // Adjust interval based on session total vs standard
-  // If baby ate less than standard in this session, they'll be hungry sooner
   var stdAvgMl = (std.mlMin + std.mlMax) / 2;
   var adjustedIntervalMs = avgIntervalMs;
   if (sessionMl > 0 && stdAvgMl > 0) {
     var ratio = sessionMl / stdAvgMl;
-    // Clamp ratio: at least 30% interval (very small feed), at most 120% (large feed)
-    ratio = Math.max(0.3, Math.min(1.2, ratio));
+    // Clamp ratio: at least 50% (small feed), at most 130% (large session)
+    ratio = Math.max(0.5, Math.min(1.3, ratio));
     adjustedIntervalMs = Math.round(avgIntervalMs * ratio);
   }
 
-  // Calculate next time from the SESSION START (first feed in group), not last feed
-  var nextTime = new Date(sessionStart.getTime() + adjustedIntervalMs);
+  // Next time from session START — interval measures from when baby started eating
+  var nextTime = new Date(sessionFirstTime.getTime() + adjustedIntervalMs);
 
   // === Calculate today's total ml (bottle + estimated nursing) ===
   var today = startOfDay(new Date());

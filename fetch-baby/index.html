@@ -2089,7 +2089,7 @@ function updatePrediction(allFeedings) {
   });
   var todayTotalMl = 0;
   todayFeedings.forEach(function(f) {
-    if (f.type === 'formula' || f.type === 'breast_milk') todayTotalMl += (f.amount || 0);
+    if (f.type === 'formula' || f.type === 'breast_milk' || f.type === 'solid') todayTotalMl += (f.amount || 0);
     if (f.type === 'nursing') todayTotalMl += (f.estimatedMl || estimateNursingMl(f.duration || 0));
   });
 
@@ -2100,15 +2100,16 @@ function updatePrediction(allFeedings) {
 
   // Remaining feeds today estimate
   var remainingMl = Math.max(0, dailyTargetMl - todayTotalMl);
-  var remainingFeeds = Math.max(0, Math.round(avgFeedsPerDay) - todayFeedings.length);
 
   // Calculate recommended amount per feed
   var recommendedMl;
-  if (remainingMl <= 0 || remainingFeeds <= 0) {
-    // Already exceeded daily target
+  if (remainingMl <= 0) {
+    // Already exceeded daily target ml
     recommendedMl = 0;
   } else {
-    recommendedMl = Math.round(remainingMl / remainingFeeds / 10) * 10;
+    // Estimate remaining feeds based on how much ml is left
+    var estimatedRemainingFeeds = Math.max(1, Math.ceil(remainingMl / avgMlPerFeed));
+    recommendedMl = Math.round(remainingMl / estimatedRemainingFeeds / 10) * 10;
     // Clamp to medical standard range
     recommendedMl = Math.max(std.mlMin, Math.min(std.mlMax, recommendedMl));
   }

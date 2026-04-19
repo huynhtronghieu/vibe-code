@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#5B9BD5">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/fetch-baby/manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%235B9BD5'/><g transform='translate(40,30)' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'><path d='M20 30h40v10a20 20 0 0 1-20 20h0a20 20 0 0 1-20-20V30'/><path d='M20 30a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10'/><path d='M20 60v40a15 15 0 0 0 15 15h10a15 15 0 0 0 15-15V60'/><line x1='20' y1='80' x2='60' y2='80'/></g></svg>">
 <title>Theo dõi cữ ăn bé</title>
 <style>
@@ -2698,7 +2698,7 @@ document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
 
   // Register Service Worker for PWA
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(function(reg) {
+    navigator.serviceWorker.register('/fetch-baby/sw.js').then(function(reg) {
       // Check for updates every 60 seconds
       setInterval(function() { reg.update(); }, 60000);
 

@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "Shopee Product Copier & Auto-Filler",
+  "version": "1.0.0",
+  "description": "Sao chép thông tin và hình ảnh sản phẩm Shopee, tự động điền và tải ảnh lên Kênh Người Bán Shopee chỉ với 1 cú click.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.shopee.vn/*",
+    "*://down-vn.img.susercontent.com/*",
+    "*://down-tx-vn.img.susercontent.com/*",
+    "*://cf.shopee.vn/*",
+    "*://images.shopee.vn/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://shopee.vn/*",
+        "*://*.shopee.vn/*"
+      ],
+      "js": [
+        "content-scripts/shopee-product-main.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://shopee.vn/*",
+        "*://*.shopee.vn/*"
+      ],
+      "js": [
+        "content-scripts/shopee-product.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://banhang.shopee.vn/*",
+        "*://seller.shopee.vn/*"
+      ],
+      "js": [
+        "content-scripts/shopee-seller.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

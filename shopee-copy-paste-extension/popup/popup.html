@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopee Copier & Auto-Filler</title>
+  <link rel="stylesheet" href="popup.css">
+  <!-- Import Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="app-logo">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+        </svg>
+        <span>Shopee Copier</span>
+      </div>
+      <div class="badge" id="status-badge">Sẵn sàng</div>
+    </header>
+
+    <main class="app-main">
+      <!-- Section: Copied Product Preview Card -->
+      <section class="card preview-card">
+        <h3>Bộ nhớ tạm Extension</h3>
+        
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-preview">
+          <svg viewBox="0 0 24 24" width="48" height="48">
+            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 16H6V4h12v14zM9 13h6v2H9v-2zm0-4h6v2H9V9z"/>
+          </svg>
+          <p>Chưa có sản phẩm nào được copy. Hãy nhấn "Copy thông tin" tại trang sản phẩm Shopee.</p>
+        </div>
+
+        <!-- Populated state -->
+        <div class="preview-content" id="preview-content" style="display:none;">
+          <div class="preview-img-container">
+            <img id="preview-image" src="" alt="Product cover">
+          </div>
+          <div class="preview-details">
+            <h4 id="preview-title">Tên sản phẩm</h4>
+            <div class="preview-meta">
+              <span class="preview-tag" id="preview-images-count">0 ảnh</span>
+              <span class="preview-tag" id="preview-price">0 đ</span>
+            </div>
+            <p id="preview-desc">Mô tả sản phẩm...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Dữ liệu lưu cục bộ trên trình duyệt</span>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

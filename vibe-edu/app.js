@@ -46,52 +46,58 @@ class VibeEduApp {
 
   bindEvents() {
     // Nav links scrolling
-    this.navLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('data-target');
-        
-        // Remove active class
-        this.navLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        
-        if (targetId === 'home') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else if (targetId === 'courses') {
-          this.coursesSection.scrollIntoView({ behavior: 'smooth' });
-        } else if (targetId === 'instructor') {
-          this.instructorSection.scrollIntoView({ behavior: 'smooth' });
-        }
+    if (this.navLinks && this.navLinks.length) {
+      this.navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-target');
+          
+          // Remove active class from all links
+          this.navLinks.forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+          
+          if (targetId === 'home') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else if (targetId === 'courses' && this.coursesSection) {
+            this.coursesSection.scrollIntoView({ behavior: 'smooth' });
+          } else if (targetId === 'instructor' && this.instructorSection) {
+            this.instructorSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
       });
-    });
+    }
 
     // CTA Button in Hero
-    if (this.btnExplore) {
+    if (this.btnExplore && this.coursesSection) {
       this.btnExplore.addEventListener('click', () => {
         this.coursesSection.scrollIntoView({ behavior: 'smooth' });
       });
     }
 
     // Filter clicks
-    this.filterTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        this.filterTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        this.currentCategory = tab.getAttribute('data-category');
-        this.renderCourses();
+    if (this.filterTabs && this.filterTabs.length) {
+      this.filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          this.filterTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          this.currentCategory = tab.getAttribute('data-category');
+          this.renderCourses();
+        });
       });
-    });
+    }
 
     // Close Modals
-    this.modalCloses.forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.closeAllModals();
+    if (this.modalCloses && this.modalCloses.length) {
+      this.modalCloses.forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.closeAllModals();
+        });
       });
-    });
+    }
 
     // Clicking outside modal closes it
     window.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal-overlay')) {
+      if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
         this.closeAllModals();
       }
     });
@@ -107,8 +113,8 @@ class VibeEduApp {
 
   // Close modals
   closeAllModals() {
-    this.syllabusModal.classList.remove('active');
-    this.registerModal.classList.remove('active');
+    if (this.syllabusModal) this.syllabusModal.classList.remove('active');
+    if (this.registerModal) this.registerModal.classList.remove('active');
     
     // Reset form states after close
     setTimeout(() => {
@@ -124,16 +130,23 @@ class VibeEduApp {
 
   // Show Toast
   showToast(message) {
-    this.toastBody.textContent = message;
-    this.toastNotification.classList.add('active');
+    if (this.toastBody) {
+      this.toastBody.textContent = message;
+    }
+    if (this.toastNotification) {
+      this.toastNotification.classList.add('active');
+    }
     
     setTimeout(() => {
-      this.toastNotification.classList.remove('active');
+      if (this.toastNotification) {
+        this.toastNotification.classList.remove('active');
+      }
     }, 4000);
   }
 
   // Populate Register select dropdown dynamically
   populateCourseSelect(selectedId = '') {
+    if (!this.registerCourseSelect) return;
     this.registerCourseSelect.innerHTML = '';
     this.courses.forEach(c => {
       const opt = document.createElement('option');
@@ -148,6 +161,7 @@ class VibeEduApp {
 
   // Render Courses Cards
   renderCourses() {
+    if (!this.coursesGrid) return;
     this.coursesGrid.innerHTML = '';
     
     const filtered = this.currentCategory === 'all' 
@@ -210,14 +224,20 @@ class VibeEduApp {
       `;
       
       // Syllabus button action
-      card.querySelector('.btn-view-syllabus').addEventListener('click', () => {
-        this.openSyllabusModal(course.id);
-      });
+      const btnSyllabus = card.querySelector('.btn-view-syllabus');
+      if (btnSyllabus) {
+        btnSyllabus.addEventListener('click', () => {
+          this.openSyllabusModal(course.id);
+        });
+      }
       
       // Register button action
-      card.querySelector('.btn-enroll').addEventListener('click', () => {
-        this.openRegisterModal(course.id);
-      });
+      const btnEnroll = card.querySelector('.btn-enroll');
+      if (btnEnroll) {
+        btnEnroll.addEventListener('click', () => {
+          this.openRegisterModal(course.id);
+        });
+      }
       
       this.coursesGrid.appendChild(card);
     });
@@ -228,27 +248,35 @@ class VibeEduApp {
     const course = this.courses.find(c => c.id === courseId);
     if (!course) return;
     
-    this.syllabusTitle.textContent = `Lộ trình: ${course.title}`;
-    this.syllabusTimeline.innerHTML = '';
+    if (this.syllabusTitle) {
+      this.syllabusTitle.textContent = `Lộ trình: ${course.title}`;
+    }
     
-    course.syllabus.forEach((item, index) => {
-      const chapter = document.createElement('div');
-      chapter.className = 'timeline-chapter';
-      chapter.innerHTML = `
-        <div class="chapter-number">${index + 1}</div>
-        <h4 class="chapter-title">${item.chapter}</h4>
-        <p class="chapter-details">${item.details}</p>
-      `;
-      this.syllabusTimeline.appendChild(chapter);
-    });
+    if (this.syllabusTimeline) {
+      this.syllabusTimeline.innerHTML = '';
+      course.syllabus.forEach((item, index) => {
+        const chapter = document.createElement('div');
+        chapter.className = 'timeline-chapter';
+        chapter.innerHTML = `
+          <div class="chapter-number">${index + 1}</div>
+          <h4 class="chapter-title">${item.chapter}</h4>
+          <p class="chapter-details">${item.details}</p>
+        `;
+        this.syllabusTimeline.appendChild(chapter);
+      });
+    }
     
-    this.syllabusModal.classList.add('active');
+    if (this.syllabusModal) {
+      this.syllabusModal.classList.add('active');
+    }
   }
 
   // Register Modal open and auto-populate
   openRegisterModal(courseId = '') {
     this.populateCourseSelect(courseId);
-    this.registerModal.classList.add('active');
+    if (this.registerModal) {
+      this.registerModal.classList.add('active');
+    }
   }
 
   // Handle Form Submission with Custom Validation
@@ -257,6 +285,8 @@ class VibeEduApp {
     const emailInput = document.getElementById('form-email');
     const phoneInput = document.getElementById('form-phone');
     
+    if (!nameInput || !emailInput || !phoneInput) return;
+
     // Custom phone validation (digits, 9-11 chars)
     const phoneRegex = /^[0-9]{9,11}$/;
     
@@ -268,17 +298,17 @@ class VibeEduApp {
     let isValid = true;
     
     if (!nameInput.value.trim()) {
-      nameInput.style.borderColor = 'var(--accent-pink)';
+      nameInput.style.borderColor = 'var(--accent-price)';
       isValid = false;
     }
     
     if (!emailInput.value.trim() || !emailInput.value.includes('@')) {
-      emailInput.style.borderColor = 'var(--accent-pink)';
+      emailInput.style.borderColor = 'var(--accent-price)';
       isValid = false;
     }
     
     if (!phoneRegex.test(phoneInput.value.trim())) {
-      phoneInput.style.borderColor = 'var(--accent-pink)';
+      phoneInput.style.borderColor = 'var(--accent-price)';
       this.showToast("Số điện thoại không hợp lệ (cần nhập 9 - 11 chữ số)!");
       isValid = false;
     }
@@ -286,16 +316,24 @@ class VibeEduApp {
     if (!isValid) return;
 
     // Get selected course details
-    const selectedCourseId = this.registerCourseSelect.value;
+    const selectedCourseId = this.registerCourseSelect ? this.registerCourseSelect.value : '';
     const course = this.courses.find(c => c.id === selectedCourseId);
     const courseTitle = course ? course.title : "Khoá học lập trình";
 
     // Show Success screen inside modal
-    this.successStudentName.textContent = nameInput.value;
-    this.successCourseTitle.textContent = courseTitle;
+    if (this.successStudentName) {
+      this.successStudentName.textContent = nameInput.value;
+    }
+    if (this.successCourseTitle) {
+      this.successCourseTitle.textContent = courseTitle;
+    }
     
-    this.registerForm.style.display = 'none';
-    this.registerSuccessScreen.style.display = 'flex';
+    if (this.registerForm) {
+      this.registerForm.style.display = 'none';
+    }
+    if (this.registerSuccessScreen) {
+      this.registerSuccessScreen.style.display = 'flex';
+    }
     
     this.showToast(`Đăng ký thành công khóa học: ${courseTitle}!`);
   }

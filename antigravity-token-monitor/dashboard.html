@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Monitor Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #00ffc8;
+            --primary-glow: rgba(0, 255, 200, 0.15);
+            --secondary: #7c3aed;
+            --secondary-glow: rgba(124, 58, 237, 0.15);
+            --accent: #00a8ff;
+            --dark-bg: #05060f;
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-bg: rgba(255, 255, 255, 0.02);
+            --text-color: var(--vscode-editor-foreground, #cccccc);
+            --header-color: var(--vscode-sideBarTitle-foreground, #ffffff);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', -apple-system, sans-serif;
+            background-color: var(--vscode-sideBar-background, var(--dark-bg));
+            color: var(--text-color);
+            padding: 16px;
+            overflow-x: hidden;
+            font-size: 14px;
+            line-height: 1.4;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Scanline Overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 200, 0.003) 2px,
+                rgba(0, 255, 200, 0.003) 4px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+            position: relative;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            background: rgba(0, 255, 200, 0.05);
+            padding: 4px 10px;
+            border-radius: 100px;
+            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--header-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary) 60%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* KPI Grid */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card.main-kpi {
+            border-left: 3px solid var(--primary);
+            box-shadow: 0 4px 20px var(--primary-glow);
+        }
+
+        .kpi-card.cost-kpi {
+            border-left: 3px solid var(--secondary);
+            box-shadow: 0 4px 20px var(--secondary-glow);
+        }
+
+        .kpi-title {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .main-kpi .kpi-value {
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .cost-kpi .kpi-value {
+            text-shadow: 0 0 10px var(--secondary);
+        }
+
+        .kpi-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 4px;
+        }
+
+        /* Detailed Breakdown */
+        .breakdown-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--header-color);
+            margin: 20px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .breakdown-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .breakdown-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 2px;
+        }
+
+        /* Chart Visual */
+        .chart-container {
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            background: var(--card-bg);
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .progress-bar-container {
+            display: flex;
+            height: 14px;
+            border-radius: 100px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .progress-bar-segment {
+            height: 100%;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .segment-prompt { background: var(--accent); }
+        .segment-cached { background: var(--primary); }
+        .segment-response { background: var(--secondary); }
+
+        .legend {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-prompt { background: var(--accent); }
+        .dot-cached { background: var(--primary); }
+        .dot-response { background: var(--secondary); }
+
+        /* Action Buttons */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            background: var(--vscode-button-background, var(--secondary));
+            color: var(--vscode-button-foreground, #ffffff);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Timeline History */
+        .history-container {
+            margin-top: 20px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* Custom scrollbar */
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.01);
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 200, 0.2);
+            border-radius: 10px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .item-model {
+            color: var(--accent);
+            font-size: 10px;
+        }
+
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+        }
+
+        .item-total {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .item-cost {
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="status-badge" id="status-badge">Monitoring</div>
+        <h1 class="title">Token Monitor</h1>
+    </div>
+
+    <!-- MAIN KPIS -->
+    <div class="kpi-container">
+        <div class="kpi-card main-kpi">
+            <div class="kpi-title">Session Burn</div>
+            <div class="kpi-value" id="val-total-tokens" data-raw-value="0">0</div>
+            <div class="kpi-desc">Total accumulated tokens</div>
+        </div>
+        <div class="kpi-card cost-kpi">
+            <div class="kpi-title">Session Cost</div>
+            <div class="kpi-value" id="val-total-cost" data-raw-value="0">0 ₫</div>
+            <div class="kpi-desc">Estimated VND pricing</div>
+        </div>
+    </div>
+
+    <!-- BAR CHART VISUAL -->
+    <div class="chart-container">
+        <div class="chart-title">Last Step Breakdown</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-segment segment-prompt" id="bar-prompt" style="width: 0%"></div>
+            <div class="progress-bar-segment segment-cached" id="bar-cached" style="width: 0%"></div>
+            <div class="progress-bar-segment segment-response" id="bar-response" style="width: 0%"></div>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><span class="dot dot-prompt"></span>Prompt</div>
+            <div class="legend-item"><span class="dot dot-cached"></span>Cached</div>
+            <div class="legend-item"><span class="dot dot-response"></span>Response</div>
+        </div>
+    </div>
+
+    <!-- DETAIL GRID -->
+    <div class="breakdown-title">
+        <span>Accumulated Breakdown</span>
+    </div>
+    <div class="breakdown-grid">
+        <div class="breakdown-card">
+            <div class="kpi-title" style="font-size: 10px; margin-bottom: 2px;">Prompt</div>
+            <div class="breakdown-num" id="val-prompt-tokens" data-raw-value="0">0</div>
+        </div>
+        <div class="breakdown-card">
+            <div class="kpi-title" style="font-size: 10px; margin-bottom: 2px;">Cached</div>
+            <div class="breakdown-num" id="val-cached-tokens" data-raw-value="0">0</div>
+        </div>
+        <div class="breakdown-card">
+            <div class="kpi-title" style="font-size: 10px; margin-bottom: 2px;">Response</div>
+            <div class="breakdown-num" id="val-response-tokens" data-raw-value="0">0</div>
+        </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="actions">
+        <button class="btn btn-secondary" id="btn-reset">Reset Session Stats</button>
+    </div>
+
+    <!-- TIMELINE HISTORY -->
+    <div class="history-container">
+        <div class="breakdown-title">
+            <span>Conversation Steps</span>
+        </div>
+        <div class="history-list" id="history-list">
+            <div style="text-align: center; color: rgba(255, 255, 255, 0.2); padding: 20px 0;">No active chat session.</div>
+        </div>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        const valTotalTokens = document.getElementById('val-total-tokens');
+        const valTotalCost = document.getElementById('val-total-cost');
+        const valPromptTokens = document.getElementById('val-prompt-tokens');
+        const valCachedTokens = document.getElementById('val-cached-tokens');
+        const valResponseTokens = document.getElementById('val-response-tokens');
+        const barPrompt = document.getElementById('bar-prompt');
+        const barCached = document.getElementById('bar-cached');
+        const barResponse = document.getElementById('bar-response');
+        const historyList = document.getElementById('history-list');
+
+        // Reset Button
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            vscode.postMessage({ command: 'reset' });
+        });
+
+        // Listen for messages from extension backend
+        window.addEventListener('message', event => {
+            const message = event.data;
+            if (message.command === 'update') {
+                const stats = message.stats;
+                updateStatsView(stats);
+            }
+        });
+
+        // Smooth Rolling Number Animation
+        function animateNumber(element, targetValue, isCurrency = false, formatFn = null) {
+            const startValue = parseFloat(element.getAttribute('data-raw-value') || '0');
+            if (startValue === targetValue) {
+                // If loaded initially, format immediately
+                if (isCurrency) {
+                    element.innerText = Math.round(targetValue).toLocaleString() + ' ₫';
+                } else if (formatFn) {
+                    element.innerText = formatFn(targetValue);
+                } else {
+                    element.innerText = Math.round(targetValue).toLocaleString();
+                }
+                return;
+            }
+
+            element.setAttribute('data-raw-value', targetValue);
+            const duration = 800; // 0.8 seconds
+            const startTime = performance.now();
+
+            function update(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease out cubic
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * ease;
+
+                if (isCurrency) {
+                    element.innerText = Math.round(currentValue).toLocaleString() + ' ₫';
+                } else if (formatFn) {
+                    element.innerText = formatFn(currentValue);
+                } else {
+                    element.innerText = Math.round(currentValue).toLocaleString();
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        function updateStatsView(stats) {
+            // Smoothly animate total values
+            animateNumber(valTotalTokens, stats.totalTokens, false, val => Math.round(val).toLocaleString());
+            animateNumber(valTotalCost, stats.totalCost, true);
+            animateNumber(valPromptTokens, stats.totalPrompt, false, formatNumber);
+            animateNumber(valCachedTokens, stats.totalCached, false, formatNumber);
+            animateNumber(valResponseTokens, stats.totalResponse, false, formatNumber);
+
+            // Update chart segments for last step
+            if (stats.steps && stats.steps.length > 0) {
+                const lastStep = stats.steps[stats.steps.length - 1];
+                const total = lastStep.total || 1;
+                const pPct = ((lastStep.input / total) * 100).toFixed(1);
+                const cPct = ((lastStep.cached / total) * 100).toFixed(1);
+                const rPct = ((lastStep.output / total) * 100).toFixed(1);
+
+                barPrompt.style.width = pPct + '%';
+                barCached.style.width = cPct + '%';
+                barResponse.style.width = rPct + '%';
+            } else {
+                barPrompt.style.width = '0%';
+                barCached.style.width = '0%';
+                barResponse.style.width = '0%';
+            }
+
+            // Update steps list
+            if (stats.steps && stats.steps.length > 0) {
+                // To avoid flashing/rebuilding on every poll, check if length is the same
+                // but wait, we want to animate/display new items nicely. We can rebuild for simplicity
+                historyList.innerHTML = '';
+                const sortedSteps = [...stats.steps].reverse();
+                sortedSteps.forEach(step => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div class="item-header">
+                            <span>Step #${step.idx}</span>
+                            <span class="item-cost">${Math.round(step.cost).toLocaleString()} ₫</span>
+                        </div>
+                        <div class="item-model">${step.model}</div>
+                        <div class="item-details">
+                            <span>In/Cache/Out:</span>
+                            <span class="item-total">${formatNumber(step.input)} / ${formatNumber(step.cached)} / ${formatNumber(step.output)}</span>
+                        </div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            } else {
+                historyList.innerHTML = '<div style="text-align: center; color: rgba(255, 255, 255, 0.2); padding: 20px 0;">No active chat session.</div>';
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return Math.round(num).toString();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "name": "antigravity-token-monitor",
+  "displayName": "Antigravity Token Monitor",
+  "description": "Monitor real-time token usage and cost in Antigravity IDE chat sessions.",
+  "version": "1.0.0",
+  "publisher": "hieuht",
+  "engines": {
+    "vscode": "^1.68.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./extension.js",
+  "scripts": {
+    "build": "bash -c 'source ~/.nvm/nvm.sh && nvm use v20.19.2 && yes y | npx @vscode/vsce package'",
+    "install-ext": "\"/Applications/Antigravity IDE.app/Contents/Resources/app/bin/antigravity-ide\" --install-extension *.vsix"
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "antigravity-token-monitor-container",
+          "title": "Antigravity Token Monitor",
+          "icon": "$(dashboard)"
+        }
+      ]
+    },
+    "views": {
+      "antigravity-token-monitor-container": [
+        {
+          "id": "antigravity-token-monitor-sidebar",
+          "type": "webview",
+          "name": "Token Dashboard"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "antigravity-token-monitor.openDashboard",
+        "title": "Antigravity Token Monitor: Open Dashboard"
+      },
+      {
+        "command": "antigravity-token-monitor.resetSession",
+        "title": "Antigravity Token Monitor: Reset Session Stats"
+      }
+    ]
+  }
+}

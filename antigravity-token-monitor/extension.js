@@ -133,24 +133,41 @@ function extractStats(fields) {
 
 function getCost(model, input, cached, output) {
     const m = (model || '').toLowerCase();
+    
+    // Default prices (Gemini Flash)
     let inputPrice = 0.075 / 1e6;
     let cachedPrice = 0.01875 / 1e6;
     let outputPrice = 0.30 / 1e6;
 
-    if (m.includes('claude')) {
+    if (m.includes('claude-3-5') || m.includes('claude')) {
         inputPrice = 3.0 / 1e6;
         cachedPrice = 0.75 / 1e6;
         outputPrice = 15.0 / 1e6;
-    } else if (m.includes('pro')) {
-        inputPrice = 1.25 / 1e6;
-        cachedPrice = 0.3125 / 1e6;
-        outputPrice = 5.0 / 1e6;
+    } else if (m.includes('gpt-4o-mini')) {
+        inputPrice = 0.15 / 1e6;
+        cachedPrice = 0.075 / 1e6;
+        outputPrice = 0.60 / 1e6;
+    } else if (m.includes('gpt-4o') || m.includes('gpt-4')) {
+        inputPrice = 2.50 / 1e6;
+        cachedPrice = 1.25 / 1e6;
+        outputPrice = 10.00 / 1e6;
+    } else if (m.includes('pro') || m.includes('gemini-1.5-pro')) {
+        const isLongContext = (input + cached) > 128000;
+        inputPrice = (isLongContext ? 2.50 : 1.25) / 1e6;
+        cachedPrice = (isLongContext ? 0.625 : 0.3125) / 1e6;
+        outputPrice = (isLongContext ? 10.00 : 5.00) / 1e6;
+    } else {
+        const isLongContext = (input + cached) > 128000;
+        inputPrice = (isLongContext ? 0.15 : 0.075) / 1e6;
+        cachedPrice = (isLongContext ? 0.0375 : 0.01875) / 1e6;
+        outputPrice = (isLongContext ? 0.60 : 0.30) / 1e6;
     }
 
     return (input * inputPrice) + (cached * cachedPrice) + (output * outputPrice);
 }
 
 // Extension state
+let extensionContext = null;
 let activeDbPath = null;
 let lastMtime = 0;
 let statusBarItem = null;
@@ -163,6 +180,22 @@ let sessionStats = {
     totalCost: 0,
     steps: []
 };
+let rawSessionStats = {
+    totalPrompt: 0,
+    totalCached: 0,
+    totalResponse: 0,
+    totalTokens: 0,
+    totalCost: 0,
+    steps: []
+};
+let resetOffset = {
+    prompt: 0,
+    cached: 0,
+    response: 0,
+    cost: 0,
+    stepsCount: 0,
+    resetTimestamp: Date.now()
+};
 
 // Find active database
 function getActiveDbPath() {
@@ -174,8 +207,12 @@ function getActiveDbPath() {
             .map(f => {
                 const filepath = path.join(convoDir, f);
                 try {
-                    const stat = fs.statSync(filepath);
-                    return { path: filepath, mtime: stat.mtimeMs };
+                    let mtime = fs.statSync(filepath).mtimeMs;
+                    const walPath = `${filepath}-wal`;
+                    if (fs.existsSync(walPath)) {
+                        mtime = Math.max(mtime, fs.statSync(walPath).mtimeMs);
+                    }
+                    return { path: filepath, mtime };
                 } catch(e) {
                     return { path: filepath, mtime: 0 };
                 }
@@ -197,6 +234,11 @@ function updateStats(force = false) {
     let mtime = 0;
     try {
         mtime = fs.statSync(currentDbPath).mtimeMs;
+        const walPath = `${currentDbPath}-wal`;
+        if (fs.existsSync(walPath)) {
+            const walMtime = fs.statSync(walPath).mtimeMs;
+            mtime = Math.max(mtime, walMtime);
+        }
     } catch(e) {
         return;
     }
@@ -204,8 +246,38 @@ function updateStats(force = false) {
     if (currentDbPath !== activeDbPath) {
         activeDbPath = currentDbPath;
         lastMtime = mtime;
-        // Reset session stats for new conversation
+        
+        // Restore offsets from workspaceState
+        if (extensionContext) {
+            const dbKey = path.basename(activeDbPath);
+            resetOffset = extensionContext.workspaceState.get(`resetOffset_${dbKey}`) || {
+                prompt: 0,
+                cached: 0,
+                response: 0,
+                cost: 0,
+                stepsCount: 0,
+                resetTimestamp: Date.now()
+            };
+        } else {
+            resetOffset = {
+                prompt: 0,
+                cached: 0,
+                response: 0,
+                cost: 0,
+                stepsCount: 0,
+                resetTimestamp: Date.now()
+            };
+        }
+
         sessionStats = {
+            totalPrompt: 0,
+            totalCached: 0,
+            totalResponse: 0,
+            totalTokens: 0,
+            totalCost: 0,
+            steps: []
+        };
+        rawSessionStats = {
             totalPrompt: 0,
             totalCached: 0,
             totalResponse: 0,
@@ -275,13 +347,29 @@ function updateStats(force = false) {
             }
         });
 
-        sessionStats = {
+        rawSessionStats = {
             totalPrompt,
             totalCached,
             totalResponse,
             totalTokens: totalPrompt + totalCached + totalResponse,
             totalCost,
             steps
+        };
+
+        const activePrompt = Math.max(0, totalPrompt - resetOffset.prompt);
+        const activeCached = Math.max(0, totalCached - resetOffset.cached);
+        const activeResponse = Math.max(0, totalResponse - resetOffset.response);
+        const activeCost = Math.max(0, totalCost - resetOffset.cost);
+        const activeSteps = steps.slice(resetOffset.stepsCount);
+
+        sessionStats = {
+            totalPrompt: activePrompt,
+            totalCached: activeCached,
+            totalResponse: activeResponse,
+            totalTokens: activePrompt + activeCached + activeResponse,
+            totalCost: activeCost,
+            steps: activeSteps,
+            resetTimestamp: resetOffset.resetTimestamp || Date.now()
         };
 
         updateUI();
@@ -335,13 +423,26 @@ class TokenDashboardProvider {
             if (message.command === 'refresh') {
                 updateStats(true);
             } else if (message.command === 'reset') {
+                resetOffset.prompt = rawSessionStats.totalPrompt;
+                resetOffset.cached = rawSessionStats.totalCached;
+                resetOffset.response = rawSessionStats.totalResponse;
+                resetOffset.cost = rawSessionStats.totalCost;
+                resetOffset.stepsCount = rawSessionStats.steps.length;
+                resetOffset.resetTimestamp = Date.now();
+
+                if (extensionContext && activeDbPath) {
+                    const dbKey = path.basename(activeDbPath);
+                    extensionContext.workspaceState.update(`resetOffset_${dbKey}`, resetOffset);
+                }
+
                 sessionStats = {
                     totalPrompt: 0,
                     totalCached: 0,
                     totalResponse: 0,
                     totalTokens: 0,
                     totalCost: 0,
-                    steps: []
+                    steps: [],
+                    resetTimestamp: resetOffset.resetTimestamp
                 };
                 updateUI();
             }
@@ -359,6 +460,7 @@ class TokenDashboardProvider {
 }
 
 function activate(context) {
+    extensionContext = context;
     console.log('Antigravity Token Monitor activated.');
 
     // Create Status Bar Item
@@ -381,13 +483,26 @@ function activate(context) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('antigravity-token-monitor.resetSession', () => {
+            resetOffset.prompt = rawSessionStats.totalPrompt;
+            resetOffset.cached = rawSessionStats.totalCached;
+            resetOffset.response = rawSessionStats.totalResponse;
+            resetOffset.cost = rawSessionStats.totalCost;
+            resetOffset.stepsCount = rawSessionStats.steps.length;
+            resetOffset.resetTimestamp = Date.now();
+
+            if (extensionContext && activeDbPath) {
+                const dbKey = path.basename(activeDbPath);
+                extensionContext.workspaceState.update(`resetOffset_${dbKey}`, resetOffset);
+            }
+
             sessionStats = {
                 totalPrompt: 0,
                 totalCached: 0,
                 totalResponse: 0,
                 totalTokens: 0,
                 totalCost: 0,
-                steps: []
+                steps: [],
+                resetTimestamp: resetOffset.resetTimestamp
             };
             updateUI();
             vscode.window.showInformationMessage('Session token statistics reset.');
@@ -398,7 +513,7 @@ function activate(context) {
     updateStats(true);
     const interval = setInterval(() => {
         updateStats();
-    }, 1500);
+    }, 300);
 
     context.subscriptions.push({
         dispose: () => clearInterval(interval)

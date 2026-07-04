@@ -3,110 +3,240 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VibeEdu — Nền Tảng Học Tập Lập Trình Trực Quan</title>
-  <meta name="description" content="Trải nghiệm học lập trình web, Flexbox, Grid và HTML5 Canvas tương tác thực tế, trực quan, hỗ trợ lưu trữ tiến trình thông minh.">
-  <meta name="keywords" content="vibe coding, education, code playground, flexbox visualizer, canvas sandbox, learn code">
+  <title>VibeEdu — Hệ Thống Đào Tạo Lập Trình Web & Creative Coding</title>
+  <meta name="description" content="Trang giới thiệu khoá học lập trình Web, Đồ hoạ Canvas & Kỹ nghệ AI Vibe Coding chuyên nghiệp, thực chiến và bài bản.">
+  <meta name="keywords" content="vibe coding, education, react, canvas, html css, javascript, hieuht, course, master frontend">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- BACKGROUND DECORATIONS -->
+  <!-- Background Grid -->
   <div class="bg-overlay"></div>
-  <div class="bg-glows">
-    <div class="glow-circle glow-1"></div>
-    <div class="glow-circle glow-2"></div>
-  </div>
-
-  <!-- NAVIGATION BAR -->
+  <!-- HEADER NAVIGATION -->
   <nav class="navbar">
-    <a href="index.html" class="nav-brand">Vibe<span>Edu</span></a>
+    <a href="#" class="nav-brand" data-target="home">Vibe<span>Edu</span></a>
     
-    <div class="nav-progress" id="nav-progress-container">
-      <span style="font-size: 11px; text-transform: uppercase; font-family: var(--font-display); color: var(--text-muted);">Tiến độ:</span>
-      <div class="nav-progress-bar-container">
-        <div class="nav-progress-fill" id="progress-fill"></div>
-      </div>
-      <span class="nav-progress-text" id="progress-text">0%</span>
+    <ul class="nav-links">
+      <li><a class="nav-link active" data-target="home">Trang Chủ</a></li>
+      <li><a class="nav-link" data-target="courses">Khóa Học</a></li>
+      <li><a class="nav-link" data-target="instructor">Giảng Viên</a></li>
+    </ul>
+
+    <div>
+      <button class="btn-cta" onclick="window.vibeEduApp.openRegisterModal()">Đăng Ký Ngay</button>
     </div>
   </nav>
 
-  <!-- DASHBOARD / COURSE LISTING VIEW -->
-  <main id="dashboard-view" class="dashboard-container">
-    <div class="dashboard-header">
-      <span class="dashboard-tagline">Học lập trình thế hệ mới</span>
-      <h1 class="dashboard-title">VIBEEDU INTERACTIVE</h1>
-      <p class="dashboard-subtitle">Chọn một chương trình học dưới đây và làm chủ kiến thức thông qua thực hành tương tác trực tiếp.</p>
+  <!-- HERO HEADER SECTION -->
+  <header class="hero-section">
+    <div class="hero-badge">Lập trình thực chiến thế hệ mới</div>
+    <h1 class="hero-title">LÀM CHỦ CÔNG NGHỆ, KIẾN TẠO TƯƠNG LAI</h1>
+    <p class="hero-subtitle">VibeEdu cung cấp các chương trình đào tạo lập trình thực chiến đỉnh cao từ Frontend Master, Mỹ thuật lập trình đến ứng dụng AI tối ưu hiệu suất làm việc.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" id="btn-explore">Khám phá khoá học</button>
+      <button class="btn-secondary" onclick="window.vibeEduApp.openRegisterModal()">Nhận tư vấn miễn phí</button>
+    </div>
+  </header>
+
+  <!-- STATS BLOCK -->
+  <section class="stats-section">
+    <div class="stat-card">
+      <div class="stat-number">1,200+</div>
+      <div class="stat-label">Học viên tham gia</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">3+</div>
+      <div class="stat-label">Lộ trình học tập</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">98%</div>
+      <div class="stat-label">Tỷ lệ hài lòng</div>
+    </div>
+  </section>
+
+  <!-- CORE PLATFORM ADVANTAGES -->
+  <section class="features-section">
+    <div class="features-grid">
+      <div class="feature-box">
+        <div class="feature-icon">💡</div>
+        <h3 class="feature-title">Học Tương Tác Thực Chiến</h3>
+        <p class="feature-desc">Bài giảng lồng ghép thực hành vẽ Canvas, cấu trúc Flexbox/Grid trực quan giúp học viên hiểu bài ngay tại lớp.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">🤖</div>
+        <h3 class="feature-title">Đón Đầu Kỷ Nguyên AI</h3>
+        <p class="feature-desc">Được hướng dẫn ứng dụng các trợ lý AI thông minh vào quy trình phát triển sản phẩm (Vibe Coding) siêu tốc.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">🏆</div>
+        <h3 class="feature-title">Đồ Án Tốt Nghiệp Thực Tế</h3>
+        <p class="feature-desc">Tự phát triển sản phẩm ứng dụng độc lập, đưa lên môi trường Internet thực tế làm hồ sơ năng lực (portfolio).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSES LISTINGS & FILTERS -->
+  <section class="courses-container" id="courses-section">
+    <div class="section-header">
+      <h2 class="section-title">Các Chương Trình Đào Tạo</h2>
+      <p class="section-desc">Lựa chọn lộ trình học tập phù hợp để bắt đầu nâng cao kỹ năng lập trình của bạn ngay hôm nay.</p>
     </div>
 
-    <div class="courses-section" id="courses-grid">
-      <!-- Course cards will be generated by app.js -->
+    <!-- Filter Buttons -->
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-category="all">Tất cả</button>
+      <button class="filter-tab" data-category="frontend">Web Frontend</button>
+      <button class="filter-tab" data-category="creative">Mỹ thuật sáng tạo</button>
+      <button class="filter-tab" data-category="ai">AI Vibe Coding</button>
     </div>
-  </main>
 
-  <!-- LESSON / CODE PLAYGROUND VIEW -->
-  <div id="lesson-view" class="learning-layout" style="display: none;">
-    <!-- LEFT PANEL: THEORY & QUIZ -->
-    <section class="panel-left">
-      <div>
-        <button class="btn-back" id="btn-back-dashboard">
-          <span>←</span> Quay lại Dashboard
-        </button>
-      </div>
+    <!-- Course Grid -->
+    <div class="courses-grid" id="courses-grid">
+      <!-- Generated dynamically by app.js -->
+    </div>
+  </section>
 
-      <div>
-        <span class="panel-header-badge" id="lesson-path">CSS LAYOUT / BÀI 1</span>
-        <h2 class="lesson-detail-title" id="lesson-title">Bài 1: Sức mạnh của Flexbox</h2>
-      </div>
-
-      <article class="theory-content" id="theory-content">
-        <!-- Theory content populated by app.js -->
-      </article>
-
-      <!-- Interactive Quiz -->
-      <div class="quiz-box">
-        <span style="font-family: var(--font-display); font-size:11px; color: var(--accent-cyan); font-weight:700; letter-spacing:1px;">TRẮC NGHIỆM NHANH</span>
-        <p class="quiz-question" id="quiz-question">Câu hỏi trắc nghiệm sẽ xuất hiện ở đây?</p>
-        
-        <div class="quiz-options" id="quiz-options">
-          <!-- Quiz options generated by app.js -->
+  <!-- REVIEWS SECTION -->
+  <section class="reviews-section">
+    <div class="section-header">
+      <h2 class="section-title">Nhận Xét Từ Học Viên</h2>
+      <p class="section-desc">Những cảm nhận thực tế của các bạn học viên sau khi kết thúc các lộ trình đào tạo tại VibeEdu.</p>
+    </div>
+    
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Nhờ khoá Frontend Master mà mình tự tin dựng bất kỳ layout UI phức tạp nào. Cách dạy Flexbox và Grid trực quan bằng widget tương tác rất dễ hiểu."</p>
+        <div class="review-user">
+          <div class="user-avatar">QA</div>
+          <div class="user-info">
+            <span class="user-name">Nguyễn Quốc Anh</span>
+            <span class="user-role">Học viên K14 - Frontend</span>
+          </div>
         </div>
-
-        <button class="quiz-submit-btn" id="quiz-submit">Nộp Câu Trả Lời</button>
-        <div class="quiz-feedback" id="quiz-feedback"></div>
       </div>
-    </section>
-
-    <!-- RIGHT PANEL: INTERACTIVE PLAYGROUND -->
-    <section class="panel-right">
-      <div class="playground-header">
-        <h3 class="playground-title" id="playground-title">Không gian tương tác: CSS Preview</h3>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Khóa Canvas khai phá hoàn toàn tư duy đồ họa lập trình của mình. Mình đã tự tay code được một game bắn hạ máy bay mini sau khóa học!"</p>
+        <div class="review-user">
+          <div class="user-avatar">ML</div>
+          <div class="user-info">
+            <span class="user-name">Trần Minh Lộc</span>
+            <span class="user-role">Học viên K08 - Canvas</span>
+          </div>
+        </div>
       </div>
-      
-      <div id="interactive-playground" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-        <!-- Widget content populated by app.js -->
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Quy trình Vibe Coding với AI giúp mình rút ngắn thời gian làm đồ án đáng kể. Giảng viên dạy cách viết prompt và chỉ đạo AI debug rất thực chiến."</p>
+        <div class="review-user">
+          <div class="user-avatar">TH</div>
+          <div class="user-info">
+            <span class="user-name">Lê Thị Thanh Hương</span>
+            <span class="user-role">Học viên K03 - AI Vibe</span>
+          </div>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Navigation footer -->
-      <footer class="lesson-navigation">
-        <button class="btn-nav-lesson" id="btn-prev-lesson">← Bài trước</button>
-        <button class="btn-nav-lesson" id="btn-next-lesson">Bài sau →</button>
-      </footer>
-    </section>
+  <!-- INSTRUCTOR PROFILE -->
+  <section class="instructor-section" id="instructor-section">
+    <div class="instructor-img-box">
+      <div class="instructor-avatar">👨‍💻</div>
+    </div>
+    <div class="instructor-info">
+      <span class="instructor-role">Người Sáng Lập / Giảng Viên</span>
+      <h3 class="instructor-name">HieuHT</h3>
+      <p class="instructor-bio">Nhà phát triển Web & kỹ sư lập trình đam mê tạo ra các giải pháp tự động hoá thông minh, sản phẩm PWA tương tác và nghiên cứu ứng dụng AI (Vibe Coding) để tăng năng suất lập trình. Anh đã tạo lập nhiều ứng dụng hữu ích trong cộng đồng Vibe Apps.</p>
+      <div class="instructor-links">
+        <a href="https://github.com/huynhtronghieu" target="_blank" class="btn-secondary" style="padding: 8px 16px; font-size: 11px;">GitHub Profile</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">Vibe<span>Edu</span></div>
+    <ul class="footer-nav">
+      <li><a class="footer-nav-link" data-target="home">Trang Chủ</a></li>
+      <li><a class="footer-nav-link" data-target="courses">Khóa Học</a></li>
+      <li><a class="footer-nav-link" data-target="instructor">Giảng Viên</a></li>
+    </ul>
+    <p class="footer-text">Thiết kế bởi <a href="https://github.com/huynhtronghieu" target="_blank">HieuHT</a> © 2026. All rights reserved.</p>
+  </footer>
+
+  <!-- SYLLABUS DETAIL MODAL -->
+  <div class="modal-overlay" id="syllabus-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="syllabus-modal-title">Lộ trình khoá học</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="syllabus-timeline" id="syllabus-timeline">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- CONGRATULATIONS OVERLAY MODAL -->
-  <div class="congrats-overlay" id="congrats-overlay">
-    <canvas class="congrats-canvas" id="congrats-canvas"></canvas>
-    <div style="text-align: center; position: relative; z-index: 11;">
-      <div style="font-size: 64px; margin-bottom: 15px;">🎉</div>
-      <h2 class="congrats-title" id="congrats-title">Chính Xác!</h2>
-      <p class="congrats-text" id="congrats-text">Bạn đã trả lời đúng câu hỏi trắc nghiệm bài học.</p>
-      <button class="quiz-submit-btn" id="congrats-btn" style="min-width: 200px;">Bài Tiếp Theo →</button>
+  <!-- REGISTRATION FORM MODAL -->
+  <div class="modal-overlay" id="register-modal">
+    <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Đăng ký khoá học</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Registration Form -->
+        <form class="register-form" id="register-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="form-name">Họ và Tên <span style="color:var(--accent-pink);">*</span></label>
+            <input class="form-input" type="text" id="form-name" placeholder="Ví dụ: Nguyễn Văn A" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-email">Địa chỉ Email <span style="color:var(--accent-pink);">*</span></label>
+            <input class="form-input" type="email" id="form-email" placeholder="email@gmail.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="form-phone">Số Điện Thoại <span style="color:var(--accent-pink);">*</span></label>
+            <input class="form-input" type="tel" id="form-phone" placeholder="Nhập 10 chữ số" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="register-course-select">Khóa học mong muốn</label>
+            <select class="form-input" id="register-course-select" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <button class="btn-form-submit" type="submit">Đăng Ký Đóng Phí Thử</button>
+        </form>
+
+        <!-- Success Screen -->
+        <div class="success-screen" id="register-success-screen" style="display: none;">
+          <div class="success-icon">🎉</div>
+          <h4 class="success-title">Đăng Ký Thành Công!</h4>
+          <p class="success-desc">Chúc mừng học viên <strong id="success-student-name" style="color:var(--text-main); font-weight: 700;"></strong> đã hoàn tất đăng ký khóa học <strong id="success-course-title" style="color:var(--accent-primary); font-weight: 700;"></strong>.</p>
+          <p class="success-desc" style="font-size:12px;">Chúng tôi sẽ gửi email hướng dẫn đóng phí và lịch học chi tiết trong vòng 24h.</p>
+          <button class="btn-primary" onclick="window.vibeEduApp.closeAllModals()" style="margin-top:10px; min-width:160px;">Xong</button>
+        </div>
+
+      </div>
     </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-notification" id="toast-notification">
+    <div class="toast-icon">✨</div>
+    <div class="toast-body" id="toast-body">Thông báo hệ thống</div>
   </div>
 
   <!-- SCRIPTS LOAD -->
-  <script src="lessons.js"></script>
+  <script src="courses.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

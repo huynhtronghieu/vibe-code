@@ -292,21 +292,27 @@ function updateStats(force = false) {
 
     lastMtime = mtime;
 
-    // Fetch all metadata records to compute running sums
-    exec(`sqlite3 "${activeDbPath}" "SELECT idx, hex(data) FROM gen_metadata ORDER BY idx ASC;"`, { maxBuffer: 25 * 1024 * 1024 }, (err, stdout, stderr) => {
+    // Fetch active steps count and all metadata records to compute running sums
+    exec(`sqlite3 "${activeDbPath}" "SELECT COUNT(*) FROM steps WHERE status NOT IN (2, 3, 7); SELECT idx, hex(data) FROM gen_metadata ORDER BY idx ASC;"`, { maxBuffer: 25 * 1024 * 1024 }, (err, stdout, stderr) => {
         if (err) {
             console.error("sqlite3 query error:", err);
             return;
         }
 
         const lines = stdout.trim().split('\n');
+        if (lines.length === 0) return;
+
+        const activeStepsCount = parseInt(lines[0]) || 0;
+        const isProcessing = activeStepsCount > 0;
+
+        const dataLines = lines.slice(1);
         const steps = [];
         let totalPrompt = 0;
         let totalCached = 0;
         let totalResponse = 0;
         let totalCost = 0;
 
-        lines.forEach(line => {
+        dataLines.forEach(line => {
             const parts = line.split('|');
             if (parts.length < 2) return;
             const idx = parseInt(parts[0]);
@@ -369,7 +375,8 @@ function updateStats(force = false) {
             totalTokens: activePrompt + activeCached + activeResponse,
             totalCost: activeCost,
             steps: activeSteps,
-            resetTimestamp: resetOffset.resetTimestamp || Date.now()
+            resetTimestamp: resetOffset.resetTimestamp || Date.now(),
+            isProcessing: isProcessing
         };
 
         updateUI();
@@ -442,7 +449,8 @@ class TokenDashboardProvider {
                     totalTokens: 0,
                     totalCost: 0,
                     steps: [],
-                    resetTimestamp: resetOffset.resetTimestamp
+                    resetTimestamp: resetOffset.resetTimestamp,
+                    isProcessing: false
                 };
                 updateUI();
             }
@@ -502,7 +510,8 @@ function activate(context) {
                 totalTokens: 0,
                 totalCost: 0,
                 steps: [],
-                resetTimestamp: resetOffset.resetTimestamp
+                resetTimestamp: resetOffset.resetTimestamp,
+                isProcessing: false
             };
             updateUI();
             vscode.window.showInformationMessage('Session token statistics reset.');

@@ -83,6 +83,7 @@
             border-radius: 100px;
             margin-bottom: 8px;
             letter-spacing: 1.5px;
+            transition: all 0.3s ease;
         }
 
         .status-badge::before {
@@ -93,6 +94,19 @@
             background-color: var(--primary);
             box-shadow: 0 0 8px var(--primary);
             animation: pulse 2s infinite ease-in-out;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.processing {
+            color: #ff9f43;
+            border-color: rgba(255, 159, 67, 0.3);
+            background: rgba(255, 159, 67, 0.05);
+        }
+
+        .status-badge.processing::before {
+            background-color: #ff9f43;
+            box-shadow: 0 0 8px #ff9f43;
+            animation: pulse 0.8s infinite ease-in-out;
         }
 
         @keyframes pulse {
@@ -384,6 +398,10 @@
         const historyList = document.getElementById('history-list');
 
         let resetTimestamp = Date.now();
+        let lastResetTimestamp = 0;
+        let isProcessing = false;
+        let elapsedBeforePause = 0;
+        let lastStartTime = Date.now();
         let animationFrameId = null;
 
         // Stopwatch function
@@ -391,7 +409,11 @@
             const timerValEl = document.getElementById('val-elapsed-time');
             if (!timerValEl) return;
 
-            const elapsedMs = Date.now() - resetTimestamp;
+            let elapsedMs = elapsedBeforePause;
+            if (isProcessing) {
+                elapsedMs += (Date.now() - lastStartTime);
+            }
+
             const totalSeconds = Math.floor(elapsedMs / 1000);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
@@ -402,16 +424,48 @@
             const formattedMs = ms.toString().padStart(3, '0');
 
             timerValEl.innerText = `${formattedMin}:${formattedSec}.${formattedMs}`;
-            animationFrameId = requestAnimationFrame(updateStopwatch);
+            
+            if (isProcessing) {
+                animationFrameId = requestAnimationFrame(updateStopwatch);
+            }
         }
 
-        function startStopwatch() {
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(updateStopwatch);
+        function setProcessingState(newProcessing) {
+            if (isProcessing === newProcessing) return;
+
+            if (newProcessing) {
+                // Resume
+                lastStartTime = Date.now();
+                isProcessing = true;
+                if (!animationFrameId) {
+                    animationFrameId = requestAnimationFrame(updateStopwatch);
+                }
+            } else {
+                // Pause
+                elapsedBeforePause += (Date.now() - lastStartTime);
+                isProcessing = false;
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+                updateStopwatch();
+            }
+
+            // Update status badge UI
+            const badge = document.getElementById('status-badge');
+            if (badge) {
+                if (isProcessing) {
+                    badge.innerText = 'Processing';
+                    badge.className = 'status-badge processing';
+                } else {
+                    badge.innerText = 'Idle';
+                    badge.className = 'status-badge';
+                }
+            }
         }
 
-        // Start Stopwatch Immediately
-        startStopwatch();
+        // Start Stopwatch Immediately (initially idle)
+        updateStopwatch();
 
         // Reset Button
         document.getElementById('btn-reset').addEventListener('click', () => {
@@ -425,7 +479,13 @@
                 const stats = message.stats;
                 if (stats.resetTimestamp) {
                     resetTimestamp = stats.resetTimestamp;
+                    if (resetTimestamp !== lastResetTimestamp) {
+                        lastResetTimestamp = resetTimestamp;
+                        elapsedBeforePause = 0;
+                        lastStartTime = Date.now();
+                    }
                 }
+                setProcessingState(stats.isProcessing || false);
                 updateStatsView(stats);
             }
         });

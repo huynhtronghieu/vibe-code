@@ -397,11 +397,9 @@
         const valTotalCost = document.getElementById('val-total-cost');
         const historyList = document.getElementById('history-list');
 
-        let resetTimestamp = Date.now();
-        let lastResetTimestamp = 0;
         let isProcessing = false;
-        let elapsedBeforePause = 0;
-        let lastStartTime = Date.now();
+        let baseElapsedTime = 0;
+        let localStartTime = Date.now();
         let animationFrameId = null;
 
         // Stopwatch function
@@ -409,9 +407,9 @@
             const timerValEl = document.getElementById('val-elapsed-time');
             if (!timerValEl) return;
 
-            let elapsedMs = elapsedBeforePause;
+            let elapsedMs = baseElapsedTime;
             if (isProcessing) {
-                elapsedMs += (Date.now() - lastStartTime);
+                elapsedMs += (Date.now() - localStartTime);
             }
 
             const totalSeconds = Math.floor(elapsedMs / 1000);
@@ -430,26 +428,25 @@
             }
         }
 
-        function setProcessingState(newProcessing) {
-            if (isProcessing === newProcessing) return;
-
-            if (newProcessing) {
-                // Resume
-                lastStartTime = Date.now();
-                isProcessing = true;
-                if (!animationFrameId) {
-                    animationFrameId = requestAnimationFrame(updateStopwatch);
+        function setStopwatchState(newProcessing, newElapsedTime) {
+            baseElapsedTime = newElapsedTime || 0;
+            localStartTime = Date.now();
+            
+            if (isProcessing !== newProcessing) {
+                isProcessing = newProcessing;
+                if (isProcessing) {
+                    if (!animationFrameId) {
+                        animationFrameId = requestAnimationFrame(updateStopwatch);
+                    }
+                } else {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
                 }
-            } else {
-                // Pause
-                elapsedBeforePause += (Date.now() - lastStartTime);
-                isProcessing = false;
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                    animationFrameId = null;
-                }
-                updateStopwatch();
             }
+            
+            updateStopwatch();
 
             // Update status badge UI
             const badge = document.getElementById('status-badge');
@@ -477,15 +474,7 @@
             const message = event.data;
             if (message.command === 'update') {
                 const stats = message.stats;
-                if (stats.resetTimestamp) {
-                    resetTimestamp = stats.resetTimestamp;
-                    if (resetTimestamp !== lastResetTimestamp) {
-                        lastResetTimestamp = resetTimestamp;
-                        elapsedBeforePause = 0;
-                        lastStartTime = Date.now();
-                    }
-                }
-                setProcessingState(stats.isProcessing || false);
+                setStopwatchState(stats.isProcessing || false, stats.elapsedTime || 0);
                 updateStatsView(stats);
             }
         });
@@ -563,7 +552,7 @@
                         item.setAttribute('data-idx', step.idx);
                         item.innerHTML = `
                             <div class="item-header">
-                                <span>Step #${step.idx}</span>
+                                <span>Step #${step.sessionIdx || step.idx}</span>
                                 <span class="item-cost">${Math.round(step.cost).toLocaleString()} ₫</span>
                             </div>
                             <div class="item-model">${step.model}</div>

@@ -171,6 +171,8 @@ let extensionContext = null;
 let activeDbPath = null;
 let lastMtime = 0;
 let lastLogMtime = 0;
+let lastUpdateTime = Date.now();
+let fileWatcher = null;
 let statusBarItem = null;
 let activePanel = null;
 let sessionStats = {
@@ -179,7 +181,9 @@ let sessionStats = {
     totalResponse: 0,
     totalTokens: 0,
     totalCost: 0,
-    steps: []
+    steps: [],
+    elapsedTime: 0,
+    isProcessing: false
 };
 let rawSessionStats = {
     totalPrompt: 0,
@@ -195,7 +199,8 @@ let resetOffset = {
     response: 0,
     cost: 0,
     stepsCount: 0,
-    resetTimestamp: Date.now()
+    resetTimestamp: Date.now(),
+    activeElapsedTime: 0
 };
 
 // Find active database
@@ -224,6 +229,38 @@ function getActiveDbPath() {
     } catch(e) {
         console.error("Error finding DB path:", e);
         return null;
+    }
+}
+
+// Instant log file watcher
+function watchLogFile(logPath) {
+    if (fileWatcher) {
+        fileWatcher.close();
+        fileWatcher = null;
+    }
+    const parentDir = path.dirname(logPath);
+    if (!fs.existsSync(logPath)) {
+        if (fs.existsSync(parentDir)) {
+            try {
+                fileWatcher = fs.watch(parentDir, (event, filename) => {
+                    if (filename === 'transcript.jsonl') {
+                        updateStats(true);
+                    }
+                });
+            } catch(e) {
+                console.error("Error watching log parent dir:", e);
+            }
+        }
+        return;
+    }
+    try {
+        fileWatcher = fs.watch(logPath, (event) => {
+            if (event === 'change') {
+                updateStats(true);
+            }
+        });
+    } catch(e) {
+        console.error("Error watching log file:", e);
     }
 }
 
@@ -265,8 +302,12 @@ function updateStats(force = false) {
                 response: 0,
                 cost: 0,
                 stepsCount: 0,
-                resetTimestamp: Date.now()
+                resetTimestamp: Date.now(),
+                activeElapsedTime: 0
             };
+            if (resetOffset.activeElapsedTime === undefined) {
+                resetOffset.activeElapsedTime = 0;
+            }
         } else {
             resetOffset = {
                 prompt: 0,
@@ -274,9 +315,13 @@ function updateStats(force = false) {
                 response: 0,
                 cost: 0,
                 stepsCount: 0,
-                resetTimestamp: Date.now()
+                resetTimestamp: Date.now(),
+                activeElapsedTime: 0
             };
         }
+
+        // Start instant file watcher on new conversation log
+        watchLogFile(logPath);
 
         sessionStats = {
             totalPrompt: 0,
@@ -284,7 +329,9 @@ function updateStats(force = false) {
             totalResponse: 0,
             totalTokens: 0,
             totalCost: 0,
-            steps: []
+            steps: [],
+            elapsedTime: 0,
+            isProcessing: false
         };
         rawSessionStats = {
             totalPrompt: 0,
@@ -333,6 +380,23 @@ function updateStats(force = false) {
             console.error("Error reading log tail:", e);
         }
     }
+    // Accumulate elapsed time in the backend
+    const now = Date.now();
+    const delta = now - lastUpdateTime;
+    lastUpdateTime = now;
+
+    if (sessionStats.isProcessing) {
+        resetOffset.activeElapsedTime += delta;
+        // Save to workspaceState
+        if (extensionContext && activeDbPath) {
+            const dbKey = path.basename(activeDbPath);
+            extensionContext.workspaceState.update(`resetOffset_${dbKey}`, resetOffset);
+        }
+    }
+
+    // Update isProcessing state in sessionStats
+    sessionStats.isProcessing = isProcessing;
+    sessionStats.elapsedTime = resetOffset.activeElapsedTime;
 
     // Fetch all metadata records to compute running sums
     exec(`sqlite3 "${activeDbPath}" "SELECT idx, hex(data) FROM gen_metadata ORDER BY idx ASC;"`, { maxBuffer: 25 * 1024 * 1024 }, (err, stdout, stderr) => {
@@ -403,7 +467,12 @@ function updateStats(force = false) {
         const activeCached = Math.max(0, totalCached - resetOffset.cached);
         const activeResponse = Math.max(0, totalResponse - resetOffset.response);
         const activeCost = Math.max(0, totalCost - resetOffset.cost);
-        const activeSteps = steps.slice(resetOffset.stepsCount);
+        const activeSteps = steps.slice(resetOffset.stepsCount).map((s, i) => {
+            return {
+                ...s,
+                sessionIdx: i + 1
+            };
+        });
 
         sessionStats = {
             totalPrompt: activePrompt,
@@ -413,7 +482,8 @@ function updateStats(force = false) {
             totalCost: activeCost,
             steps: activeSteps,
             resetTimestamp: resetOffset.resetTimestamp || Date.now(),
-            isProcessing: isProcessing
+            isProcessing: isProcessing,
+            elapsedTime: resetOffset.activeElapsedTime
         };
 
         updateUI();
@@ -473,6 +543,7 @@ class TokenDashboardProvider {
                 resetOffset.cost = rawSessionStats.totalCost;
                 resetOffset.stepsCount = rawSessionStats.steps.length;
                 resetOffset.resetTimestamp = Date.now();
+                resetOffset.activeElapsedTime = 0;
 
                 if (extensionContext && activeDbPath) {
                     const dbKey = path.basename(activeDbPath);
@@ -487,7 +558,8 @@ class TokenDashboardProvider {
                     totalCost: 0,
                     steps: [],
                     resetTimestamp: resetOffset.resetTimestamp,
-                    isProcessing: false
+                    isProcessing: false,
+                    elapsedTime: 0
                 };
                 updateUI();
             }
@@ -534,6 +606,7 @@ function activate(context) {
             resetOffset.cost = rawSessionStats.totalCost;
             resetOffset.stepsCount = rawSessionStats.steps.length;
             resetOffset.resetTimestamp = Date.now();
+            resetOffset.activeElapsedTime = 0;
 
             if (extensionContext && activeDbPath) {
                 const dbKey = path.basename(activeDbPath);
@@ -548,7 +621,8 @@ function activate(context) {
                 totalCost: 0,
                 steps: [],
                 resetTimestamp: resetOffset.resetTimestamp,
-                isProcessing: false
+                isProcessing: false,
+                elapsedTime: 0
             };
             updateUI();
             vscode.window.showInformationMessage('Session token statistics reset.');

@@ -170,6 +170,7 @@ function getCost(model, input, cached, output) {
 let extensionContext = null;
 let activeDbPath = null;
 let lastMtime = 0;
+let lastLogMtime = 0;
 let statusBarItem = null;
 let activePanel = null;
 let sessionStats = {
@@ -226,18 +227,25 @@ function getActiveDbPath() {
     }
 }
 
-// Query and parse database
 function updateStats(force = false) {
     const currentDbPath = getActiveDbPath();
     if (!currentDbPath) return;
 
+    const dbName = path.basename(currentDbPath);
+    const convoId = dbName.substring(0, dbName.length - 3);
+    const logPath = path.join(os.homedir(), '.gemini', 'antigravity-ide', 'brain', convoId, '.system_generated', 'logs', 'transcript.jsonl');
+
     let mtime = 0;
+    let logMtime = 0;
     try {
         mtime = fs.statSync(currentDbPath).mtimeMs;
         const walPath = `${currentDbPath}-wal`;
         if (fs.existsSync(walPath)) {
             const walMtime = fs.statSync(walPath).mtimeMs;
             mtime = Math.max(mtime, walMtime);
+        }
+        if (fs.existsSync(logPath)) {
+            logMtime = fs.statSync(logPath).mtimeMs;
         }
     } catch(e) {
         return;
@@ -246,6 +254,7 @@ function updateStats(force = false) {
     if (currentDbPath !== activeDbPath) {
         activeDbPath = currentDbPath;
         lastMtime = mtime;
+        lastLogMtime = logMtime;
         
         // Restore offsets from workspaceState
         if (extensionContext) {
@@ -286,26 +295,54 @@ function updateStats(force = false) {
             steps: []
         };
         force = true;
-    } else if (mtime === lastMtime && !force) {
+    } else if (mtime === lastMtime && logMtime === lastLogMtime && !force) {
         return; // nothing changed
     }
 
     lastMtime = mtime;
+    lastLogMtime = logMtime;
 
-    // Fetch active steps count and all metadata records to compute running sums
-    exec(`sqlite3 "${activeDbPath}" "SELECT COUNT(*) FROM steps WHERE status NOT IN (2, 3, 7); SELECT idx, hex(data) FROM gen_metadata ORDER BY idx ASC;"`, { maxBuffer: 25 * 1024 * 1024 }, (err, stdout, stderr) => {
+    // Detect if agent is actively processing based on transcript.jsonl's last step type
+    let isProcessing = false;
+    if (fs.existsSync(logPath)) {
+        try {
+            const fd = fs.openSync(logPath, 'r');
+            const stat = fs.fstatSync(fd);
+            const bufferSize = Math.min(stat.size, 4096);
+            if (bufferSize > 0) {
+                const buffer = Buffer.alloc(bufferSize);
+                fs.readSync(fd, buffer, 0, bufferSize, stat.size - bufferSize);
+                fs.closeSync(fd);
+
+                const chunk = buffer.toString('utf8').trim();
+                const lines = chunk.split('\n');
+                if (lines.length > 0) {
+                    const lastLine = lines[lines.length - 1];
+                    const step = JSON.parse(lastLine);
+                    // Idle if and only if the last log line is a PLANNER_RESPONSE with no tool calls
+                    if (step.type === 'PLANNER_RESPONSE' && (!step.tool_calls || step.tool_calls.length === 0)) {
+                        isProcessing = false;
+                    } else {
+                        isProcessing = true;
+                    }
+                }
+            } else {
+                fs.closeSync(fd);
+            }
+        } catch(e) {
+            console.error("Error reading log tail:", e);
+        }
+    }
+
+    // Fetch all metadata records to compute running sums
+    exec(`sqlite3 "${activeDbPath}" "SELECT idx, hex(data) FROM gen_metadata ORDER BY idx ASC;"`, { maxBuffer: 25 * 1024 * 1024 }, (err, stdout, stderr) => {
         if (err) {
             console.error("sqlite3 query error:", err);
             return;
         }
 
         const lines = stdout.trim().split('\n');
-        if (lines.length === 0) return;
-
-        const activeStepsCount = parseInt(lines[0]) || 0;
-        const isProcessing = activeStepsCount > 0;
-
-        const dataLines = lines.slice(1);
+        const dataLines = lines[0] === '' ? [] : lines;
         const steps = [];
         let totalPrompt = 0;
         let totalCached = 0;
